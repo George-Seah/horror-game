@@ -126,3 +126,7 @@ Burst emits the following error at compile-time:
 
 >[!IMPORTANT]
 >These intrinsics don't work inside `if` statements. Burst doesn't prevent this from happening, so you won't see a compile-time error for this.
+
+## Additional resources
+
+* [Burst intrinsics](csharp-burst-intrinsics.md)

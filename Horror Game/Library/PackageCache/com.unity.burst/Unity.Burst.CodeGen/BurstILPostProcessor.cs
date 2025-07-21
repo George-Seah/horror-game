@@ -202,7 +202,33 @@ namespace zzzUnity.Burst.CodeGen
 
         public override bool WillProcess(ICompiledAssembly compiledAssembly)
         {
+#if UNITY_2021_1_OR_NEWER
+            // If Burst is disabled via the command line or an environment variable,
+            // then don't post-process the assembly.
+            if (IsBurstForceDisabled())
+            {
+                return false;
+            }
+            return compiledAssembly.Name == "Unity.Burst" || compiledAssembly.References.Any(f => Path.GetFileName(f) == "Unity.Burst.dll");
+#else
             return compiledAssembly.References.Any(f => Path.GetFileName(f) == "Unity.Burst.dll");
+#endif
+        }
+
+        private static bool IsBurstForceDisabled()
+        {
+            // Ideally we'd also check the `--burst-disable-compilation` command line arg here.
+            // But we can't, because this code runs in a separate process from the Editor, and
+            // it has its own command line args. So we can only check the environment variable,
+            // which _is_ propagated from the Editor process.
+
+            var disableCompilation = Environment.GetEnvironmentVariable("UNITY_BURST_DISABLE_COMPILATION");
+            if (!string.IsNullOrEmpty(disableCompilation) && disableCompilation != "0")
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

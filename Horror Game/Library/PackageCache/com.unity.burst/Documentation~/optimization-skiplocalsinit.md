@@ -1,8 +1,8 @@
 # SkipLocalsInit attribute
 
-Use [`SkipLocalsInitAttribute`](xref:Unity.Burst.CompilerServices.SkipLocalsInitAttribute), to tell Burst that any stack allocations within a method don't have to be initialized to zero.
+Use [`SkipLocalsInitAttribute`](xref:Unity.Burst.CompilerServices.SkipLocalsInitAttribute) to tell Burst that any stack allocations within a method don't have to be initialized to zero.
 
-In C# all local variables are initialized to zero by default. This is useful because it means an entire class of bugs surrounding undefined data disappears. But this can impact runtime performance, because initializing this data to zero takes work:
+In C# all local variables are initialized to zero by default, which prevents a class of bugs related to undefined data. But this can impact runtime performance because initializing this data to zero takes work:
 
 ```c#
 static unsafe int DoSomethingWithLUT(int* data);
@@ -194,3 +194,6 @@ The assembly after adding the `[SkipLocalsInit]` on the method is:
 
 The call to memset is now gone, because you've told Burst that any stack allocations within a method don't have to be initialized to zero. 
 
+## Additional resources
+
+* [`[SkipLocalsInitAttribute]` API reference](xref:Unity.Burst.CompilerServices.SkipLocalsInitAttribute)

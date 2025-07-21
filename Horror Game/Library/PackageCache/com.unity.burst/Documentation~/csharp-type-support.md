@@ -174,3 +174,8 @@ private struct MyTuple
 }
 ```
 
+## Additional resources
+
+* [HPC# overview](csharp-hpc-overview.md)
+* [String support](csharp-string-support.md)
+* [C#/.NET System namespace support](csharp-system-support.md)

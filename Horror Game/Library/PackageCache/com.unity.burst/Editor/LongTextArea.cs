@@ -610,6 +610,43 @@ namespace Unity.Burst.Editor
             GUI.matrix = matrix; // restore initial matrix to avoid floating point inaccuracies with RotateAroundPivot(...)
         }
 
+        private int CalculateNumberOfLines(int width, string text)
+        {
+            var lineCount = 1;
+            var col = 0;
+            var wordCharCount = 0;
+            for (var i = 0; i < text.Length; i++)
+            {
+                var ch = text[i];
+                if (char.IsWhiteSpace(ch) || ch == '-')
+                {
+                    if (col + wordCharCount < width)
+                    {
+                        col++; // space
+                    }
+                    else
+                    {
+                        lineCount++;
+                        col = 0;
+                    }
+
+                    col += wordCharCount;
+                    wordCharCount = 0;
+                }
+                else
+                {
+                    wordCharCount++;
+                }
+            }
+
+            if (wordCharCount + col >= width)
+            {
+                lineCount++;
+            }
+
+            return lineCount;
+        }
+
         private void DrawHover(GUIStyle style, Rect workingArea)
         {
             if (!hover.valid)
@@ -619,24 +656,24 @@ namespace Unity.Burst.Editor
             if (hover.box.size == Vector2.zero)
             {
                 // Hover size has not been initialized yet.
-                var sizex = (hover.info.Length + 1.5f) * fontWidth;
-                var sizey = 2f * fontHeight;
-                var posx = hover.box.x + 10;
+                var sizex = (hover.info.Length + 2.0f) * fontWidth;
+                var sizey = 2.0f * fontHeight;
+                var posx = hover.box.x + 10f;
                 var posy = hover.box.y;
                 if (posx + sizex > workingArea.width)
                 {
                     // Box exceeds rightmost bound so cramp it in
                     var availableSpace = workingArea.xMax - posx;
                     var possiblyCharacters = Mathf.FloorToInt(availableSpace / fontWidth);
-                    var neededLines = hover.info.Length / possiblyCharacters + 2; // +2 to ensure enough lines for the label
+                    var neededLines = CalculateNumberOfLines(possiblyCharacters - 1, hover.info);
 
                     var availableSpacey = workingArea.yMax - posy;
                     var possibleLines = Mathf.FloorToInt(availableSpacey / fontHeight);
 
-                    var tmp = neededLines - possibleLines;
-                    if (tmp > 0)
+                    var diff = neededLines - possibleLines;
+                    if (diff > 0)
                     {
-                        posy -= tmp * fontHeight;
+                        posy -= diff * fontHeight;
                     }
 
                     sizey = neededLines * fontHeight + fontHeight;
@@ -658,8 +695,8 @@ namespace Unity.Burst.Editor
             GUI.Label(
                 new Rect(pos.x + fontWidth * 0.5f,
                     pos.y + fontHeight * 0.5f,
-                    size.x - fontWidth/2f,
-                    size.y - fontHeight),
+                    size.x - fontWidth/2f + 1.0f,
+                    size.y - fontHeight + 1.0f),
                 hover.info, hoverStyle);
 
             GUI.color = col;

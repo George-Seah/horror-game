@@ -1,5 +1,91 @@
 # Changelog
 
+## [1.8.23] - 2025-06-13
+
+
+### Fixed
+- Fixed "Building for 'visionOS-simulator', but linking in object file built for 'visionOS'" errors that could occur in 1.8.22
+- Fixed crash that could occur during Burst compilation for methods with `Span<T>` or `ReadOnlySpan<T>` parameter types
+- Fixed Burst compilation error related to `Aliasing.ExpectNotAliased` failing because of unexpected aliasing of `[NativeContainer]` types
+
+### Changed
+- On QNX and Embedded Linux, the `BurstDebugInformation_DoNotShip` folder is now prefixed with the player build directory name instead of the product name.
+
+## [1.8.22] - 2025-05-26
+
+
+### Changed
+- When Burst is disabled via the `UNITY_BURST_DISABLE_COMPILATION` environment variable, Burst's IL postprocessor is also now disabled
+- Invoking `GetUnsafePtr()` on any `NativeContainer` collection type inside a job struct will now return a pointer that is assumed to `[NoAlias]` with other `NativeContainer` collection types within the same job struct (previously this was just the case with `NativeLists` and `NativeArrays`)
+- Set the default LLVM version in use to LLVM 19
+- Changed Burst minimum editor version to 2021.3
+
+### Added
+- Added support for cross-compiling Burst code for iOS, tvOS, and visionOS from Linux and Windows. Note that a Mac is still required to build the resulting Xcode project.
+
+### Fixed
+- Fixed compiler crash when using a non-`int` value value loaded from a field for bitshifting a vector type
+- Fixed that Burst wouldn't use new versions of previously installed package assemblies if they were installed in that same session
+- Fixed the alias performance regression when using LLVM 19, that was introduced in Burst version 1.8.21 (when LLVM 19 support was added)
+- Fixed "no platform load command found" Xcode build warnings for Burst binaries that could occur in iOS / tvOS / visionOS player builds
+- The `burst.initialize.static.*` functions now only invoke the static constructors actually used by the associated entry point . Similarly, `burst.initialize.externals.*` only set up the externals invoked by the associated entry point.
+
+## [1.8.21] - 2025-03-19
+
+- update EmbeddedLinux argument syntax to support newer clang versions
+
+### Added
+- Added LLVM 19 Support
+- Added stack protector AOT settings options.
+- Added an `[Alias]` attribute that can be applied to job structs and/or fields to indicate they _can_ alias. The attribute is experimental and can be used to override default implicit `[NoAlias]` attributes (like in job structs)
+- Added support for 16 KB page sizes in Android
+
+### Removed
+
+### Fixed
+- Fixed hashing error that could occur when an assembly contained a type reference with a "module" resolution scope
+- Fixed internal compiler error when using a `FixedStringNBytes` value in an interpolated string
+- Fixed a crash caused by assigning `null` to a `Span`
+- Fixed "Unable to resolve the method" error that occurred when two or more methods had the same name, one of the methods contained a generic parameter, and the generic parameter type had two or more generic arguments
+- Fixed handling of `stackalloc`ed arrays with initial values for newer versions of Visual Studio
+- When building for Android with the Mono scripting backend, arm64-v8a symbols could be incorrectly included in the output, even though Mono for Android only supports armv7. This is now fixed.
+- Fixed compiler crash that could happen when using an interface method that had a default implementation defined in another interface
+- Fixed cropping of tooltips in the inspector.
+- Fixed rare "Unhandled exception. System.InvalidCastException: Unable to cast object of type 'System.IO.MemoryStream' to type 'System.Text.StringBuilder'" error that could occur during Burst compilation
+- Fixed a `BC1054` error that could occur if a struct with a pointer-to-generic-parameter-typed field was used as a generic argument to an interface type
+- Fixed compiler crash when trying to use the `Span<T>(T[])` or `Span<T>(T[],int,int)` constructors
+- Fixed the alias performance regression when using LLVM 19, that was introduced in Burst version 1.8.20 (when LLVM 19 support was added)
+- Fixed that a struct address would incorrectly be assumed not to alias with its `[NoAlias]` members if its first field was a `[NoAlias]` field (either explicitly marked as job, or a `NativeArray` in a job struct).
+
+### Changed
+- EmbeddedLinux SSE4 default
+- Job structs now by default carry an implicit `[NoAlias]` attribute.
+
+### Known Issues
+- With LLVM 19, Burst's alias analysis is more conservative than it needs to be which may result in performance reductions in Burst compiled code. This is will be addressed in the next Burst release. Note that at this time, Burst by default uses LLVM 18.
+
+## [1.8.19] - 2025-01-17
+
+
+### Changed
+- Source file checksums are now included in pdb debugging files, so that Visual Studio can warn when source files differ from when the pdb was built
+- Added support for `HashCode.Combine`
+
+### Fixed
+- Fixed hash generation error for derived default interface methods
+- Fixed resolution of local variable types in generic default interface methods
+- Fixed crash that could occur when a target method of `BurstCompiler.CompileFunctionPointer` was already decorated with `[MonoPInvokeCallback]`. If this existing attribute existed in a namespace other than `AOT`, Burst's IL postprocessor would add a second `[MonoPInvokeCallback]`, resulting in a runtime crash on IL2CPP.
+- Fix crash when trying to Burst compile a project without any Bursted code with debug info enabled, when it has already been compiled without debug info before.
+- Fixed `BC1055: Unable to resolve the definition of the method ...` errors when compiling code using `in` method parameters for multiple CPU targets
+- Fixed an issue preventing debugging of managed methods that use direct call, regardless of whether Burst compilation is manually disabled
+- Fixed a rare concurrency issue in the entry point finder.
+
+### Added
+
+### Removed
+
+### Known Issues
+
 ## [1.8.18] - 2024-09-04
 
 

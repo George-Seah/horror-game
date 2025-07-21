@@ -245,11 +245,6 @@ namespace Unity.Burst
         /// <returns>A pointer into an executable region, for running the function pointer.</returns>
         public static unsafe void* GetILPPMethodFunctionPointer2(IntPtr ilppMethod, RuntimeMethodHandle managedMethodHandle, RuntimeTypeHandle delegateTypeHandle)
         {
-            if (ilppMethod == IntPtr.Zero)
-            {
-                throw new ArgumentNullException(nameof(ilppMethod));
-            }
-
             if (managedMethodHandle.Value == IntPtr.Zero)
             {
                 throw new ArgumentNullException(nameof(managedMethodHandle));
@@ -260,15 +255,26 @@ namespace Unity.Burst
                 throw new ArgumentNullException(nameof(delegateTypeHandle));
             }
 
+            void GetManagedFallbackDelegate(out Delegate managedFallbackDelegate, out GCHandle gcHandle)
+            {
+                var managedMethod = (MethodInfo)MethodBase.GetMethodFromHandle(managedMethodHandle);
+                var delegateType = Type.GetTypeFromHandle(delegateTypeHandle);
+                managedFallbackDelegate = Delegate.CreateDelegate(delegateType, managedMethod);
+                gcHandle = GCHandle.Alloc(managedFallbackDelegate);
+            }
+
             // If we are in the editor, we need to route a command to the compiler to start compiling the deferred ILPP compilation.
             // Otherwise if we're in Burst's internal testing, or in a player build, we already actually have the actual executable
             // pointer address, and we just return that.
 #if UNITY_EDITOR
-            var managedMethod = (MethodInfo)MethodBase.GetMethodFromHandle(managedMethodHandle);
-            var delegateType = Type.GetTypeFromHandle(delegateTypeHandle);
-            var managedFallbackDelegate = Delegate.CreateDelegate(delegateType, managedMethod);
+            if (ilppMethod == IntPtr.Zero)
+            {
+                // If we have an empty ilppMethod here, it means something went wrong
+                // in CompileILPPMethod2.
+                throw new ArgumentNullException(nameof(ilppMethod));
+            }
 
-            var handle = GCHandle.Alloc(managedFallbackDelegate);
+            GetManagedFallbackDelegate(out _, out var handle);
 
             var result =
                 BeginCompilerCommand(BurstCompilerOptions.CompilerCommandILPPCompilation)
@@ -279,6 +285,14 @@ namespace Unity.Burst
 
             return new IntPtr(Convert.ToInt64(result, 16)).ToPointer();
 #else
+            if (ilppMethod == IntPtr.Zero)
+            {
+                // If we have an empty ilppMethod here, it means something we are missing
+                // the Burst-compiled version of this entry point. That's okay, we'll
+                // fallback to the managed version.
+                GetManagedFallbackDelegate(out var managedFallbackDelegate, out _);
+                return (void*)Marshal.GetFunctionPointerForDelegate(managedFallbackDelegate);
+            }
             return ilppMethod.ToPointer();
 #endif
         }
@@ -418,12 +432,31 @@ namespace Unity.Burst
             // The attribute is directly on the method, so we recover the underlying method here
             if (BurstCompilerOptions.HasBurstCompileAttribute(methodInfo))
             {
+                function = null;
+
                 if (Options.EnableBurstCompilation && BurstCompilerHelper.IsBurstGenerated)
                 {
+                    if (isFunctionPointer)
+                    {
+                        // Redirect requests for $BurstManaged direct-call-generated methods to the original method.
+                        // We do this here because if we are in a player build, we need to lookup the function using
+                        // the original name, but if we can't resolve the Burst-compiled function, then we need to
+                        // fallback to the original method below.
+                        if (methodInfo.Name.EndsWith("$BurstManaged"))
+                        {
+                            var redirectedMethod = methodInfo.DeclaringType.GetMethod(
+                                methodInfo.Name.Replace("$BurstManaged", ""),
+                                BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic);
+
+                            delegateObj = redirectedMethod.CreateDelegate(delegateMethod.GetType());
+                        }
+                    }
+
                     var delegateMethodId = Unity.Burst.LowLevel.BurstCompilerService.CompileAsyncDelegateMethod(delegateObj, string.Empty);
                     function = Unity.Burst.LowLevel.BurstCompilerService.GetAsyncCompiledAsyncDelegateMethod(delegateMethodId);
                 }
-                else
+
+                if (function == null)
                 {
                     // If this is for direct-call, and we're in a player, with Burst disabled, then we should return null,
                     // since we don't actually have a managedFallbackDelegateMethod at this point.
@@ -487,6 +520,12 @@ namespace Unity.Burst
         {
             public bool AlreadyLoaded = false;
             public bool IsScriptDebugInfoEnabled = false;
+            public bool PackagesChanged = false;
+        }
+
+        internal static void NotifyPackagesChanged()
+        {
+            DomainReloadStateSingleton.instance.PackagesChanged = true;
         }
 
         internal static bool WasScriptDebugInfoEnabledAtDomainReload => DomainReloadStateSingleton.instance.IsScriptDebugInfoEnabled;
@@ -525,7 +564,7 @@ namespace Unity.Burst
                 foreach (var assemblyName in assemblyNames)
                 {
                     cmdBuilder.With(assemblyName)
-                              .With(assemblySeparator);
+                        .With(assemblySeparator);
                 }
 
                 DomainReloadStateSingleton.instance.AlreadyLoaded = true;
@@ -533,6 +572,14 @@ namespace Unity.Burst
             }
 
             cmdBuilder.SendToCompiler();
+
+            // If the domain reload caused by the user altering the packages, make sure we invalidate all known assemblies
+            if (DomainReloadStateSingleton.instance.PackagesChanged)
+            {
+                BeginCompilerCommand(BurstCompilerOptions.CompilerCommandDirtyAllAssemblies)
+                    .SendToCompiler();
+                DomainReloadStateSingleton.instance.PackagesChanged = false;
+            }
         }
 
         internal static string VersionNotify(string version)

@@ -23,3 +23,9 @@ Use the [`Unity.Burst.Intrinsics.Common.umul128`](xref:Unity.Burst.Intrinsics.Co
 The `Unity.Burst.Intrinsics.Common.InterlockedAnd` and `Unity.Burst.Intrinsics.Common.InterlockedOr` are experimental intrinsics that provides atomic and/or operations on `int`, `uint`, `long`, and `ulong` types.
 
 Because these intrinsics are experimental, you must use the `UNITY_BURST_EXPERIMENTAL_ATOMIC_INTRINSICS` preprocessor define to get access to them.
+
+## Additional resources 
+
+* [`Unity.Burst.Intrinsics.Common` API reference](xref:Unity.Burst.Intrinsics.Common)
+* [Processor-specific SIMD extensions](csharp-burst-intrinsics-processors.md)
+* [Burst Arm Neon intrinsics reference](csharp-burst-intrinsics-neon.md)

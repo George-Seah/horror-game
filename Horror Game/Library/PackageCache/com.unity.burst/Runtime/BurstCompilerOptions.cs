@@ -61,6 +61,7 @@ namespace Unity.Burst
         internal const string OptionBurstcSwitch = "+burstc";
         internal const string OptionGroup = "group";
         internal const string OptionPlatform = "platform=";
+        internal const string OptionMinimumOSVersion = "minimum-os-version=";
         internal const string OptionBackend = "backend=";
         internal const string OptionGlobalSafetyChecksSetting = "global-safety-checks-setting=";
         internal const string OptionDisableSafetyChecks = "disable-safety-checks";
@@ -87,10 +88,14 @@ namespace Unity.Burst
         internal const string OptionEnableDirectExternalLinking = "enable-direct-external-linking";
         internal const string OptionLinkerOptions = "linker-options=";
         internal const string OptionEnableAutoLayoutFallbackCheck = "enable-autolayout-fallback-check";
+        internal const string OptionEnableFrameInfoRegistration = "enable-frame-info-registration";
         internal const string OptionGenerateLinkXml = "generate-link-xml=";
         internal const string OptionMetaDataGeneration = "meta-data-generation=";
         internal const string OptionDisableStringInterpolationInExceptionMessages = "disable-string-interpolation-in-exception-messages";
         internal const string OptionPlatformConfiguration = "platform-configuration=";
+        internal const string OptionStackProtector = "stack-protector=";
+        internal const string OptionStackProtectorBufferSize = "stack-protector-buffer-size=";
+        internal const string OptionForceDisableFrameInfoRegistration = "force-disable-frame-info-registration";
 
         // -------------------------------------------------------
         // Options used by the Jit and Bcl compilers
@@ -171,6 +176,7 @@ namespace Unity.Burst
         internal const string CompilerCommandNotifyAssemblyCompilationFinished = "$notify_assembly_compilation_finished";
         internal const string CompilerCommandNotifyCompilationStarted = "$notify_compilation_started";
         internal const string CompilerCommandNotifyCompilationFinished = "$notify_compilation_finished";
+        internal const string CompilerCommandDirtyAllAssemblies = "$dirty_all_assemblies";
         internal const string CompilerCommandAotCompilation = "$aot_compilation";
         internal const string CompilerCommandRequestInitialiseDebuggerCommmand = "$request_debug_command";
         internal const string CompilerCommandInitialiseDebuggerCommmand = "$load_debugger_interface";
@@ -579,6 +585,11 @@ namespace Unity.Burst
             if (!isForCompilerClient && ((attr?.CompileSynchronously ?? false) || RequiresSynchronousCompilation))
             {
                 AddOption(flagsBuilderOut, GetOption(OptionJitEnableSynchronousCompilation));
+            }
+
+            if (!BurstCompiler.IsApiAvailable("RegisterFrameInfo"))
+            {
+                AddOption(flagsBuilderOut, GetOption(OptionForceDisableFrameInfoRegistration));
             }
 
             AddOption(flagsBuilderOut, GetOption(OptionDebug,

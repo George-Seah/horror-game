@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.9.3] - 2025-01-06
+- Fixed a bug where spaces are removed when highlighted.
+- Changed VisualSplitter to twoPaneSplitView and updated indentation
+
 ## [4.9.2] - 2022-02-22
 - Fixed a bug that stopped keyboard keys from affecting navigation and interaction with search results list, unless user explicitly focused/click on list using the mouse [1396759]
 

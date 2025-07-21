@@ -1,15 +1,6 @@
 # Generic jobs
 
-Burst compiles a job in two ways:
-
-* In the Editor, it compiles the job when it's scheduled, known as just-in-time (JIT) compilation.
-* In a player build, it compiles the job as part of the built player, known as ahead-of-time (AOT) compilation.
-
-For more information, see the documentation on [Compilation](compilation-overview.md).
-
-If the job is a concrete type (doesn't use generics), Burst compiles it in both modes (AOT and JIT). However, a generic job might behave in an unexpected way.
-
-While Burst supports generics, it has limited support for generic jobs or function pointers. If you notice that a job scheduled in the Editor is running at full speed, but not in a built player, it's might be a problem related to generic jobs.
+While Burst supports generics, it has limited support for generic jobs or function pointers. If you notice that a job runs at full speed in the Editor but not in a built Player, the problem might be related to generic jobs.
 
 The following example defines a generic job:
 
@@ -39,7 +30,7 @@ public class MyGenericSystem<TData> where TData : struct {
 }
 ```
 
-Jobs that aren't Burst compiled look like this:
+Jobs that are Burst-compiled look like this:
 
 ```c#
 // Direct Generic Job
@@ -51,9 +42,9 @@ var myJobSystem = new MyGenericSystem<float>();
 myJobSystem.Run();
 ```
 
-In both cases, in a player build, the Burst compiler detects that it has to compile `MyGenericJob<int>` and `MyGenericJob<float>`. This is because the generic jobs (or the type surrounding it for the nested job) are used with fully resolved generic arguments (`int` and `float`).
+In both cases, in a Player build, the Burst compiler detects that it has to compile `MyGenericJob<int>` and `MyGenericJob<float>`. This is because the generic jobs (or the type surrounding it for the nested job) are used with fully resolved generic arguments (`int` and `float`).
 
-However, if these jobs are used indirectly through a generic parameter, the Burst compiler can't detect the jobs it has to compile at player build time:
+However, if these jobs are used indirectly through a generic parameter, the Burst compiler can't detect the jobs it has to compile at Player build time:
 
 ```c#
 public static void GenericJobSchedule<TData>() where TData: struct {
@@ -68,7 +59,7 @@ public static void GenericJobSchedule<TData>() where TData: struct {
 GenericJobSchedule<int>();
 ```
 
-The same restriction applies if you declare the job in the context of generic parameter that comes from a type:
+The same restriction applies if you declare the job in the context of a generic parameter that comes from a type:
 
 ```c#
 // Generic Parameter TData
@@ -99,4 +90,9 @@ var myGenericFunctionPointer = BurstCompiler.CompileFunctionPointer<MyGenericDel
 
 This limitation is because of a limitation of the .NET runtime to interop with such delegates.
 
-For more information, see the documentation on [Function pointers](csharp-function-pointers.md).
+For more information, refer to [Function pointers](csharp-function-pointers.md).
+
+## Additional resources
+
+* [Burst compilation in Play mode](compilation-synchronous.md)
+* [Job system](xref:um-job-system)

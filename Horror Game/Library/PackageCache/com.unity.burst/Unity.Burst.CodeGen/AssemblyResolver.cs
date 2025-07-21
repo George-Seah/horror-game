@@ -179,7 +179,63 @@ namespace zzzUnity.Burst.CodeGen
                     return methodDef2;
                 }
 
-                return base.Resolve(method);
+                var result = base.Resolve(method);
+
+                // There's a bug in Cecil where if we try to load a module again (usually when compiling for a different target)
+                // the modreqs on method definition parameters will be lost. Which means that method reference resolutions will
+                // fail. This checks tries to create a modreq-free version of the method reference (and if there were any modreqs)
+                // try to resolve that instead.
+                if (result == null)
+                {
+                    var modreqStrippedMethod = new MethodReference(method.Name, method.ReturnType, method.DeclaringType);
+                    modreqStrippedMethod.CallingConvention = method.CallingConvention;
+                    modreqStrippedMethod.ExplicitThis = method.ExplicitThis;
+                    modreqStrippedMethod.HasThis = method.HasThis;
+                    foreach (var gparam in method.GenericParameters)
+                    {
+                        modreqStrippedMethod.GenericParameters.Add(gparam);
+                    }
+
+                    bool hasModreqs = false;
+                    foreach (var param in method.Parameters)
+                    {
+                        if (param.ParameterType is RequiredModifierType modreqType)
+                        {
+                            hasModreqs = true;
+                            var strippedParam = new ParameterDefinition(param.Name, param.Attributes, modreqType.ElementType);
+                            strippedParam.MetadataToken = param.MetadataToken;
+                            strippedParam.IsIn = param.IsIn || modreqType.ModifierType.FullName == "System.Runtime.InteropServices.InAttribute";
+                            strippedParam.IsOut = param.IsOut || modreqType.ModifierType.FullName == "System.Runtime.InteropServices.OutAttribute";
+                            strippedParam.IsOptional = param.IsOptional;
+                            strippedParam.Constant = param.Constant;
+                            strippedParam.HasDefault = param.HasDefault;
+                            strippedParam.MarshalInfo = param.MarshalInfo;
+                            modreqStrippedMethod.Parameters.Add(strippedParam);
+                        }
+                        else
+                        {
+                            modreqStrippedMethod.Parameters.Add(param);
+                        }
+                    }
+
+                    if (hasModreqs)
+                    {
+                        if (method is GenericInstanceMethod genericMethod)
+                        {
+                            var genericModreqStrippedMethod = new GenericInstanceMethod(modreqStrippedMethod);
+                            foreach (var garg in genericMethod.GenericArguments)
+                            {
+                                genericModreqStrippedMethod.GenericArguments.Add(garg);
+                            }
+
+                            modreqStrippedMethod = genericModreqStrippedMethod;
+                        }
+
+                        result = base.Resolve(modreqStrippedMethod);
+                    }
+                }
+
+                return result;
             }
         }
 

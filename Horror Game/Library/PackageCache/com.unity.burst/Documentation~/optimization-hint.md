@@ -38,7 +38,7 @@ else
 
 The `Likely` and `Unlikely` intrinsics make sure that Burst places the code most likely to be hit after the branching condition in the binary. This means that the code has a high probability of being in the instruction cache. Burst can also hoist the code out of the likely branch and spend extra time optimizing it, and not spend as much time looking at the unlikely code.
 
-An example of an unlikely branch is to check if result of an allocation is valid. The allocation is valid most of all the time, so you want the code to be fast with that assumption, but you want an error case to fall back to.
+An example of an unlikely branch is to check if the result of an allocation is valid. The allocation is valid most of the time, so you want the code to be fast with that assumption, but you want an error case to fall back to.
 
 ## Assume intrinsic
 
@@ -61,3 +61,8 @@ else
 ```
 
 Use the `Assume` intrinsic to arbitrarily tell Burst that something is true. For example, you can use `Assume` to tell Burst to assume that a loop end is always a multiple of 16, which means that it can provide perfect vectorization without any scalar spilling for that loop. You could also use it to tell Burst that a value isn't `NaN`, or it's negative.
+
+## Additional resources
+
+* [`[Hint]` API reference](xref:Unity.Burst.CompilerServices.Hint)
+* [Burst intrinsics overview](csharp-burst-intrinsics.md)

@@ -518,7 +518,7 @@ namespace Unity.Burst.Editor
                         instructionInfo = "TLB Invalidate operation.";
                         break;
                     case "tst":
-                        instructionInfo = ", setting the condition flags and discarding the result.";
+                        instructionInfo = "Test the value in a register against another register, setting the condition flags and discarding the result.";
                         break;
                     case "ubfiz":
                         instructionInfo = "Unsigned Bitfield Insert in Zero.";

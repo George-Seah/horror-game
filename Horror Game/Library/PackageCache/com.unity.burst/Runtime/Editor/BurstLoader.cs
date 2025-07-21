@@ -110,6 +110,28 @@ namespace Unity.Burst.Editor
                 return;
             }
 
+#if UNITY_2021_1_OR_NEWER
+            // If Burst was previously disabled (either via the command line or an environment variable),
+            // and is now enabled, then we need to force script recompilation.
+            //
+            // Why? Because when Burst is disabled, we also don't run Burst's IL postprocessor. If the last
+            // script compilation occurred when Burst was disabled, then those compiled script assemblies
+            // may still be cached, and wouldn't be recompiled / re-IL-postprocessed unless we specifically
+            // make that happen.
+            //
+            // We use "is Burst assembly not currently IL-postprocessed" as a proxy for
+            // "was Burst previously disabled".
+            if (typeof(BurstLoader).Assembly.GetType("$BurstDirectCallInitializer") == null)
+            {
+                UnityEngine.Debug.Log("[com.unity.burst] Burst was previously disabled and is now enabled; recompiling scripts");
+#if UNITY_2021_2_OR_NEWER
+                CompilationPipeline.RequestScriptCompilation(RequestScriptCompilationOptions.CleanBuildCache);
+#else
+                CompilationPipeline.RequestScriptCompilation();
+#endif
+            }
+#endif
+
             // This can be setup to get more diagnostics
             var debuggingStr = Environment.GetEnvironmentVariable("UNITY_BURST_DEBUG");
             IsDebugging = debuggingStr != null && int.TryParse(debuggingStr, out var debugLevel) && debugLevel > 0;
@@ -239,6 +261,10 @@ namespace Unity.Burst.Editor
                     EditorUtility.DisplayDialog("Burst Package Has Been Removed", "Please restart the Editor to continue.", "OK");
                 }
                 BurstCompiler.Shutdown();
+            }
+            else
+            {
+                BurstCompiler.NotifyPackagesChanged();
             }
         }
 

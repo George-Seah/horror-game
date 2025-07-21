@@ -1,6 +1,6 @@
 # Calling Burst-compiled code
 
-You can call Burst-compiled methods direct from managed code. Calling generic methods or methods whose declaring type is generic isn't supported, otherwise the rules as for [function pointers](csharp-function-pointers.md) apply. However, you don't need to worry about the extra boiler plate needed for function pointers.
+You can call Burst-compiled methods direct from managed code. Calling generic methods or methods whose declaring type is generic isn't supported, otherwise the same rules as for [function pointers](csharp-function-pointers.md) apply. However, you don't need to worry about the extra boiler plate needed for function pointers.
 
 The following example shows a Burst-compiled utility class. Because it uses structs, it passes by reference per the [function pointer](csharp-function-pointers.md) rules.
 
@@ -35,7 +35,7 @@ If you attach this script to an object and run it, `float4(98f, 2f, -3f, 4f)` is
 
 ## Code transformation
 
-Burst uses IL Post Processing to automatically transform the code into a function pointer and call. For more information, see the documentation on [Function pointers](csharp-function-pointers.md).
+Burst uses IL Post Processing to automatically transform the code into a function pointer and call. For more information, refer to the documentation on [Function pointers](csharp-function-pointers.md).
 
 To disable the direct call transformation, add`DisableDirectCall = true` to the BurstCompile options. This prevents the Post Processor from running on the code:
 
@@ -50,3 +50,8 @@ public static class MyBurstUtilityClass
     }
 }
 ```
+
+## Additional resources
+
+* [HPC# Overview](csharp-hpc-overview.md)
+* [Function pointers](csharp-function-pointers.md)

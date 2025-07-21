@@ -7,11 +7,13 @@ namespace StarterAssets
 {
 	public class StarterAssetsInputs : MonoBehaviour
 	{
+		PlayerShoot playerShoot;
 		[Header("Character Input Values")]
 		public Vector2 move;
 		public Vector2 look;
 		public bool jump;
 		public bool sprint;
+		public bool shoot;
 
 		[Header("Movement Settings")]
 		public bool analogMovement;
@@ -19,6 +21,11 @@ namespace StarterAssets
 		[Header("Mouse Cursor Settings")]
 		public bool cursorLocked = true;
 		public bool cursorInputForLook = true;
+
+		void Awake()
+		{
+			playerShoot = GetComponentInChildren<PlayerShoot>();
+		}
 
 #if ENABLE_INPUT_SYSTEM
 		public void OnMove(InputValue value)
@@ -43,6 +50,9 @@ namespace StarterAssets
 		{
 			SprintInput(value.isPressed);
 		}
+		public void OnShoot(InputValue value){
+			ShootInput(value.isPressed);
+		}
 #endif
 
 
@@ -65,7 +75,11 @@ namespace StarterAssets
 		{
 			sprint = newSprintState;
 		}
-		
+		public void ShootInput(bool newShootState)
+		{
+			shoot = newShootState;
+			playerShoot.Shoot();
+		}
 		private void OnApplicationFocus(bool hasFocus)
 		{
 			SetCursorState(cursorLocked);

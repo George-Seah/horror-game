@@ -44,6 +44,8 @@ namespace zzzUnity.Burst.CodeGen
         private const string GetFunctionPointerDiscardName = "GetFunctionPointerDiscard";
         private const string InvokeName = "Invoke";
 
+        private static readonly bool EnableManagedFallbacksInPlayerBuilds = Environment.GetEnvironmentVariable("UNITY_BURST_ENABLE_MANAGED_FALLBACKS_IN_PLAYER_BUILDS") == "1";
+
         public ILPostProcessing(AssemblyResolver loader, bool isForEditor, ErrorDiagnosticDelegate error, LogDelegate log = null, int logLevel = 0, bool skipInitializeOnLoad = false)
         {
             _skipInitializeOnLoad = skipInitializeOnLoad;
@@ -456,7 +458,7 @@ namespace zzzUnity.Burst.CodeGen
         private TypeDefinition InjectDelegate(TypeDefinition declaringType, string originalName, MethodDefinition managed, string uniqueSuffix)
         {
             var injectedDelegateType = new TypeDefinition(declaringType.Namespace, $"{originalName}{uniqueSuffix}{PostfixBurstDelegate}",
-                TypeAttributes.NestedPublic |
+                TypeAttributes.NestedAssembly |
                 TypeAttributes.AutoLayout |
                 TypeAttributes.AnsiClass |
                 TypeAttributes.Sealed
@@ -572,7 +574,6 @@ namespace zzzUnity.Burst.CodeGen
             }
 
             genericGetValue.HasThis = _functionPointerGetValue.HasThis;
-            genericGetValue.MetadataToken = _functionPointerGetValue.MetadataToken;
 
             /*var genericGetValue = new Mono.Cecil.GenericInstanceMethod(_functionPointerGetValue)
             {
@@ -718,9 +719,9 @@ namespace zzzUnity.Burst.CodeGen
             // 0x0100 is AggressiveInlining
             managedFallbackMethod.ImplAttributes |= (MethodImplAttributes)0x0100;
 
-            // The method needs to be public because we query for it in the ILPP code.
-            managedFallbackMethod.Attributes &= ~MethodAttributes.Private;
-            managedFallbackMethod.Attributes |= MethodAttributes.Public;
+            // The method needs to be internal because we query for it in the ILPP code.
+            managedFallbackMethod.Attributes &= ~MethodAttributes.Public;
+            managedFallbackMethod.Attributes |= MethodAttributes.Assembly;
 
             // private static class (Name_RID.$Postfix)
             var cls = new TypeDefinition(declaringType.Namespace, $"{burstCompileMethod.Name}{uniqueSuffix}{PostfixBurstDirectCall}",
@@ -750,9 +751,17 @@ namespace zzzUnity.Burst.CodeGen
             var getFunctionPointerDiscardMethod = CreateGetFunctionPointerDiscardMethod(
                 cls, pointerField,
                 // In the player the function pointer is looked up in a registry by name
-                // so we can't request a `$BurstManaged` function (because it was never compiled, only the toplevel one)
-                // But, it's safe *in the player* to request the toplevel function
-                IsForEditor ? managedFallbackMethod : burstCompileMethod,
+                // so we normally can't request a `$BurstManaged` function (because it was never compiled, only the toplevel one)
+                // But, it's safe *in the player* to request the toplevel function.
+                //
+                // However... in order to allow managed fallbacks in player builds, as an opt-in feature,
+                // users can set UNITY_BURST_ENABLE_MANAGED_FALLBACKS_IN_PLAYER_BUILDS=1. If that environment
+                // variable is set, then we do actually request `$BurstManaged` functions in player builds,
+                // and in BurstCompiler.cs we redirect that to the original method when looking up in the registry.
+                // Why do we do that? Because we want to use the `$BurstManaged` function
+                // as a managed fallback if the Burst-compiled function lookup fails.
+                // This redirection has a runtime cost, which is why it's opt-in.
+                IsForEditor || EnableManagedFallbacksInPlayerBuilds ? managedFallbackMethod : burstCompileMethod,
                 injectedDelegate);
             var getFunctionPointerMethod = CreateGetFunctionPointerMethod(cls, getFunctionPointerDiscardMethod);
 
@@ -824,6 +833,9 @@ namespace zzzUnity.Burst.CodeGen
             processor.Emit(OpCodes.Call, invoke);
             processor.Emit(OpCodes.Ret);
             FixDebugInformation(burstCompileMethod);
+
+            // Ensure that the original method does not have any sequence points
+            burstCompileMethod.DebugInformation.SequencePoints.Clear();
         }
 
         private static MethodDefinition FixDebugInformation(MethodDefinition method)

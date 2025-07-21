@@ -29,7 +29,7 @@ Burst also provides alternatives for some C# constructions not directly accessib
 
 ### Exception expressions
 
-Burst supports `throw` expressions for exceptions. Exceptions thrown in the **editor** can be caught by managed code, and are reported in the console window. Exceptions thrown in **player builds** will always cause the application to abort. Thus with Burst you should only use exceptions for exceptional behavior. To ensure that code doesn't end up relying on exceptions for things like general control flow, Burst produces the following warning on code that tries to `throw` within a method not attributed with `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]`:
+Burst supports `throw` expressions for exceptions. Exceptions thrown in the Editor can be caught by managed code, and are reported in the console window. Exceptions thrown in Player builds always cause the application to abort. Thus with Burst you should only use exceptions for exceptional behavior. To ensure that code doesn't end up relying on exceptions for things like general control flow, Burst produces the following warning on code that tries to `throw` within a method not attributed with `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]`:
 
 > Burst warning BC1370: An exception was thrown from a function without the correct [Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")] guard. Exceptions only work in the editor and so should be protected by this guard
 
@@ -65,5 +65,12 @@ In the method `IterateThroughGenericCollection()` below it, however, the paramet
 HPC# doesn't support the following C# features:
 
 * Catching exceptions `catch` in a `try`/`catch`.
-* Storing to static fields except via [Shared Static](csharp-shared-static.md)
+* Storing to static fields except via [Shared Static](csharp-shared-static.md).
 * Any methods related to managed objects, for example, string methods.
+
+## Additional resources
+
+* [Static read-only fields and static constructor support](csharp-static-read-only-support.md)
+* [String support](csharp-string-support.md)
+* [C#/.NET type support](csharp-type-support.md)
+* [C#/.NET System namespace support](csharp-system-support.md)

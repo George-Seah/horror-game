@@ -64,6 +64,14 @@ namespace Unity.Burst.Editor
         ARMV9A = 1 << AvailArm64Targets.ARMV9A,
     }
 
+    internal enum StackProtector
+    {
+        Off,
+        Basic,
+        Strong,
+        All,
+    }
+
     [AttributeUsage(AttributeTargets.Field)]
     internal class BurstMetadataSettingAttribute : Attribute { }
 
@@ -139,6 +147,10 @@ namespace Unity.Burst.Editor
         [SerializeField]
         [BurstCommonSetting]
         internal string DisabledWarnings;
+        [SerializeField]
+        internal StackProtector StackProtector;
+        [SerializeField]
+        internal uint StackProtectorBufferSize;
 
         internal static readonly string EnableDebugInAllBuilds_DisplayName = "Force Debug Information";
         internal static readonly string EnableDebugInAllBuilds_ToolTip = "Generates debug information for the Burst-compiled code, irrespective of if Development Mode is ticked. This can be used to generate symbols for release builds for platforms that need it.";
@@ -200,6 +212,32 @@ namespace Unity.Burst.Editor
             return selectedTarget == BuildTarget.Android;
         }
 
+        internal static readonly string StackProtector_DisplayName = "Stack Protector";
+        internal static readonly string StackProtector_ToolTip = "Stack protector level for the selected platform.";
+
+        internal static bool StackProtector_Display(BuildTarget selectedTarget, string architecture)
+        {
+            return selectedTarget == BuildTarget.Android;
+        }
+
+        internal static bool StackProtector_Serialise(BuildTarget selectedTarget)
+        {
+            return selectedTarget == BuildTarget.Android;
+        }
+
+        internal static readonly string StackProtectorBufferSize_DisplayName = "Stack Protector Buffer Size";
+        internal static readonly string StackProtectorBufferSize_ToolTip = "Stack protector buffer size for the selected platform.";
+
+        internal static bool StackProtectorBufferSize_Display(BuildTarget selectedTarget, string architecture)
+        {
+            return selectedTarget == BuildTarget.Android;
+        }
+
+        internal static bool StackProtectorBufferSize_Serialise(BuildTarget selectedTarget)
+        {
+            return selectedTarget == BuildTarget.Android;
+        }
+
         internal static bool IsStandalone(BuildTarget target)
         {
             switch (target)
@@ -219,7 +257,7 @@ namespace Unity.Burst.Editor
             InitialiseDefaults();
         }
 
-        private const int DefaultVersion = 4;
+        private const int DefaultVersion = 5;
 
         internal void InitialiseDefaults()
         {
@@ -239,6 +277,8 @@ namespace Unity.Burst.Editor
             CpuTargetsArm64 = BitsetArm64Targets.ARMV8A;
             DisabledWarnings = "";
             OptimizeFor = OptimizeFor.Default;
+            StackProtector = StackProtector.Off;
+            StackProtectorBufferSize = 8;
         }
 
         internal static string GetPath(BuildTarget? target)
@@ -306,9 +346,13 @@ namespace Unity.Burst.Editor
 #endif
 
             // For EmbeddedLinux and QNX, the burstMiscFolder is placed as a sibling of the build folder.
+            // They also use the build directory name instead of the player product name for the BurstDebugInformation folder.
             if (summary.platform == (BuildTarget)embeddedLinuxTarget || summary.platform == (BuildTarget)qnxTarget)
             {
                 finalOutputPath = Path.GetDirectoryName(finalOutputPath);
+
+                var buildDirectoryName = Path.GetFileNameWithoutExtension(summary.outputPath);
+                burstMiscFolderName = $"{RemoveIllegalPathChars(buildDirectoryName)}{BurstMiscPathPostFix}";
             }
 
             return Path.Combine(finalOutputPath, burstMiscFolderName);
@@ -449,6 +493,14 @@ namespace Unity.Burst.Editor
                 upgraded = true;
             }
 
+            if (versioned.Version < 5)
+            {
+                // Upgrade with stack protector options.
+                versioned.Version = 5;
+                versioned.StackProtector = StackProtector.Off;
+                versioned.StackProtectorBufferSize = 8;
+            }
+
             // Otherwise should be a modern file with a valid version (we can use that to upgrade when the time comes)
             return versioned;
         }
@@ -508,6 +560,8 @@ namespace Unity.Burst.Editor
                         s.Append($"\"{platformFields[i].GetValue(this)}\"");
                     else if (platformFields[i].FieldType == typeof(bool))
                         s.Append(((bool)platformFields[i].GetValue(this)) ? "true" : "false");
+                    else if (platformFields[i].FieldType == typeof(uint))
+                        s.Append((uint)platformFields[i].GetValue(this));
                     else
                         s.Append((int)platformFields[i].GetValue(this));
 

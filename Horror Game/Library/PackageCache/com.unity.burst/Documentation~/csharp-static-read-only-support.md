@@ -2,7 +2,7 @@
 
 Burst evaluates all static fields and all static constructors at compile time. It evaluates all the static fields and the static constructors for a given struct together. 
 
-When there is a static field that isn't read-only in a Burst-compiled struct, a compilation error happens. This is because Burst only supports read-only static fields.
+Burst only supports read-only static fields. A static field that isn't read-only in a Burst-compiled struct causes a compilation error.
 
 When Burst fails to evaluate any static field or static constructor, all fields and constructors fail for that struct. 
 
@@ -30,3 +30,9 @@ It supports using the following base language with static read-only fields and c
     * `NUnit.Framework.Assert.AreEqual`
     * `NUnit.Framework.Assert.AreNotEqual`
 * Simple throw patterns. Any exceptions thrown during evaluation become compiler errors.
+
+## Additional resources
+
+* [String support](csharp-string-support.md)
+* [C#/.NET type support](csharp-type-support.md)
+* [C#/.NET System namespace support](csharp-system-support.md)

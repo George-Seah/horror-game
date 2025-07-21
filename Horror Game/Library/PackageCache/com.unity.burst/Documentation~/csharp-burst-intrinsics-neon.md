@@ -4,7 +4,7 @@ uid: neon-intrinsics
 
 # Burst Arm Neon intrinsics reference
 
-This page contains an ordered reference for the APIs in [Unity.Burst.Intrinsics.Arm.Neon](xref:Unity.Burst.Intrinsics.Arm.Neon). For information on how to use these, see the documentation on [Processor specific SIMD extensions](csharp-burst-intrinsics-processors.md).
+This page contains an ordered reference for the APIs in [Unity.Burst.Intrinsics.Arm.Neon](xref:Unity.Burst.Intrinsics.Arm.Neon). For information on how to use these, refer to [Processor specific SIMD extensions](csharp-burst-intrinsics-processors.md).
 
 ### Intrinsics type creation and conversion
 
@@ -253,3 +253,7 @@ This page contains an ordered reference for the APIs in [Unity.Burst.Intrinsics.
 |vsqrt|Square root|<details><summary>Click here to expand the API list</summary>[vsqrt_f32](xref:Unity.Burst.Intrinsics.Arm.Neon.vsqrt_f32*)<br/> [vsqrt_f64](xref:Unity.Burst.Intrinsics.Arm.Neon.vsqrt_f64*)<br/> [vsqrtq_f32](xref:Unity.Burst.Intrinsics.Arm.Neon.vsqrtq_f32*)<br/> [vsqrtq_f64](xref:Unity.Burst.Intrinsics.Arm.Neon.vsqrtq_f64*)<br/></details>|
 |vdot|Dot product|<details><summary>Click here to expand the API list</summary>[vdot_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_s32*)<br/> [vdot_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_u32*)<br/> [vdotq_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_s32*)<br/> [vdotq_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_u32*)<br/></details>|
 |vdot_lane|Dot product|<details><summary>Click here to expand the API list</summary>[vdot_lane_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_lane_s32*)<br/> [vdot_lane_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_lane_u32*)<br/> [vdot_laneq_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_laneq_s32*)<br/> [vdot_laneq_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdot_laneq_u32*)<br/> [vdotq_lane_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_lane_s32*)<br/> [vdotq_lane_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_lane_u32*)<br/> [vdotq_laneq_s32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_laneq_s32*)<br/> [vdotq_laneq_u32](xref:Unity.Burst.Intrinsics.Arm.Neon.vdotq_laneq_u32*)<br/></details>|
+
+## Additional resources 
+
+* [Processor specific SIMD extensions](csharp-burst-intrinsics-processors.md)

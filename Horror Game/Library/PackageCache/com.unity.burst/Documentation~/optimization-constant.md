@@ -31,13 +31,15 @@ public static float MyAwesomePow(float f, int i)
 }
 ```
 
-The `IsConstantExpression` check means that Burst always removes the branch  if `i` isn't constant, because the if condition is false. This means that if `i` is constant and is equal to 2, you can use a more optimal simple multiply instead.
+The `IsConstantExpression` check means that Burst always removes the branch  if `i` isn't constant, because the if condition is false. This means that if `i` is constant and is equal to 2, you can use a more efficient simple multiply instead.
 
-The result of `IsConstantExpression` intentionally depends on the result of the optimizations being run. Therefore the result can change based on whether
-a function gets inlined or not. For example in the case above: `IsConstantExpression(i)` is false on its own, because `i` is a function
-argument which is obivously not constant. However, if `MyAwesomePow` gets inlined with a constant value for `i`, then it will evaluate to true.
-
-But if `MyAwesomePow` ends up not being inlined for whatever reason, then `IsConstantExpression(i)` will remain false.
+The result of `IsConstantExpression` intentionally depends on the result of the optimizations being run. Therefore the result can change based on whether a function gets inlined or not. For example, in the previous case: `IsConstantExpression(i)` is false on its own, because `i` is a function
+argument which is not constant. However, if `MyAwesomePow` gets inlined with a constant value for `i`, then it evaluates true. If `MyAwesomePow` ends up not being inlined, then `IsConstantExpression(i)` remains false.
 
 >[!NOTE]
 > Constant folding only takes place during optimizations. If you've disabled optimizations, the intrinsic returns false.
+
+## Additional resources
+
+* [`[IsConstantExpression]` API reference](xref:Unity.Burst.CompilerServices.Constant.IsConstantExpression*)
+* [Burst intrinsics overview](csharp-burst-intrinsics.md)

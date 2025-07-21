@@ -60,7 +60,7 @@ String interpolation has the following restrictions:
     * `short` / `ushort`
     * `int` / `uint`
     * `long` / `ulong`
-* Burst supports sll vector types (for example `int2`, `float3`), except `half` vector types. For example:
+* Burst supports all vector types (for example `int2`, `float3`), except `half` vector types. For example:
 
     ```c#
     var value = new float3(1.0f, 2.0f, 3.0f);
@@ -68,11 +68,11 @@ String interpolation has the following restrictions:
     Debug.Log($"This value `{value}`");
 * Burst doesn't support `ToString()` of structs. It displays the full name of the struct instead.
 
-For more information, see the .NET documentation on [String interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated) and  [Standard numeric format strings](https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings).
+For more information, refer to the .NET documentation on [String interpolation](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/interpolated) and [Standard numeric format strings](https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings).
 
 ## Managed strings
 
-You can pass a managed `string` literal or an interpolated string directly to `Debug.Log`, but you can't pass a string to a user method or to use them as fields in a struct. To pass around or store strings, use one of the [`FixedString`](https://docs.unity3d.com/Packages/com.unity.collections@1.2/api/Unity.Collections.FixedString.html) structs in the `Unity.Collections` package:
+You can pass a managed `string` literal or an interpolated string directly to `Debug.Log`, but you can't pass a string to a user method or use them as fields in a struct. To pass around or store strings, use one of the [`FixedString`](https://docs.unity3d.com/Packages/com.unity.collections@1.2/api/Unity.Collections.FixedString.html) structs in the `Unity.Collections` package:
 
 ```c#
 int value = 256;
@@ -111,3 +111,9 @@ Debug.Log($"This value `{value:x4}`");
 // Decimal with leading-zero: "This value `0256`
 Debug.Log($"This value `{value:D4}`");
 ```
+
+## Additional resources
+
+* [HPC# Overview](csharp-hpc-overview.md)
+* [C#/.NET type support](csharp-type-support.md)
+* [C#/.NET System namespace support](csharp-system-support.md)

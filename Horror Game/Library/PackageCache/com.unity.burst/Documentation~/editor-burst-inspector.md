@@ -2,17 +2,17 @@
 
 The Burst Inspector window displays all the jobs and other Burst compile targets in the project. To open the Burst Inspector window, go to **Jobs** &gt; **Burst** &gt; **Open Inspector**.
 
-The Burst Inspector displays all the Jobs that it can compile. It also displays the generated intermediate and native assembly code.
+The Burst Inspector displays all the jobs Burst can compile. It also displays the generated intermediate and native assembly code.
 
-When opening a new target job in the Burst Inspector, it will try to focus the assembly directly related to the chosen bursted job. Furthermore, if branch flow arrows are shown, and they fill more than half of the assembly view, the inspector will scroll horizontally rightwards to focus the code instead of the branches.
+When opening a new target job in the Burst Inspector, it will try to focus the assembly directly related to the chosen bursted job. If branch flow arrows are shown and fill more than half of the assembly view, the inspector scrolls horizontally rightwards to focus the code instead of the branches.
 
 ![Burst Inspector](images/burst-inspector.png)<br/>_Burst Inspector with Branch Flow enabled_
 
 ## Burst Inspector panes
 
-The **Compile Targets** pane on the left of the window displays an alphabetical list of the jobs in the project that Burst can compile. By default jobs either in the Unity namespace or with ".Generated" in the name are excluded. This can be changed via the toggles **Show Unity Namespace** and **Show ".Generated"** respectively. Disabled jobs in the list don't have the `[BurstCompile]` attribute.
+The **Compile Targets** pane on the left of the window displays an alphabetical list of jobs in the project that Burst can compile. By default jobs either in the Unity namespace or with ".Generated" in the name are excluded. This can be changed via the toggles **Show Unity Namespace** and **Show ".Generated"** respectively. Disabled jobs in the list don't have the `[BurstCompile]` attribute.
 
-The right output pane of the Burst Inspector window displays options to view the assembly and intermediate code for the job you've selected in the **Compile Targets** list. To expand or collapse elements of the code, select the colored boxes (some with ellipses) . By default. the Burst Inspector automatically collapses blocks that it considers non-essential, such as most directives and data.
+The right output pane of the Burst Inspector window displays options to view the assembly and intermediate code for the job you've selected in the **Compile Targets** list. To expand or collapse elements of the code, select the colored boxes (some with ellipses). By default the Burst Inspector automatically collapses non-essential blocks, such as most directives and data.
 
 It is possible to select lines of assembly. This will highlight the selected line, by underlining it. If this line contains any registers, the usage of these registers will be highlighted throughout the code; note that implicit registers are ignored for this feature.
 
@@ -41,3 +41,8 @@ At the top of the window, the following display options are available:
 | **LLVM IR (Unoptimized)**                                                                       | Displays the internal LLVM IR before optimizations.                                                                                                                                                                                                                                                      |
 | **LLVM IR (Optimized)**                                                                         | Displays the internal LLVM IR after optimizations.                                                                                                                                                                                                                                                       |
 | **LLVM IR Optimization Diagnostics**                                                            | Displays LLVM diagnostics of the optimizations, such as if they succeeded or failed.                                                                                                                                                                                                                     |
+
+## Additional resources 
+
+* [Burst menu](editor-burst-menu.md)
+* [Job system](xref:um-job-system)

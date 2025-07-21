@@ -58,7 +58,11 @@ namespace UnityEditor.Searcher
                         highlighting = true;
                         if (!string.IsNullOrEmpty(substring))
                         {
-                            container.Add(new Label(substring));
+                            var label = new Label(substring);
+#if UNITY_6000_0_OR_NEWER
+                            label.style.whiteSpace = WhiteSpace.Pre;
+#endif
+                            container.Add(label);
                             substring = string.Empty;
                         }
 
@@ -70,6 +74,9 @@ namespace UnityEditor.Searcher
                     case k_EndHighlightSeparator: {
                         var label = new Label(substring);
                         label.AddToClassList(k_HighlightedStyleClassName);
+#if UNITY_6000_0_OR_NEWER
+                        label.style.whiteSpace = WhiteSpace.Pre;
+#endif
                         container.Add(label);
 
                         highlighting = false;

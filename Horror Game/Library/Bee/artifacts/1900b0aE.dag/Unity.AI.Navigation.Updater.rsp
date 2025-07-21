@@ -378,6 +378,8 @@
 -r:"Library/PackageCache/com.unity.collab-proxy/Lib/Editor/Unity.Plastic.Newtonsoft.Json.dll"
 -r:"Library/PackageCache/com.unity.collab-proxy/Lib/Editor/unityplastic.dll"
 -r:"Library/PackageCache/com.unity.collections/Unity.Collections.LowLevel.ILSupport/Unity.Collections.LowLevel.ILSupport.dll"
+-r:"Library/PackageCache/com.unity.collections/Unity.Collections.Tests/System.IO.Hashing/System.IO.Hashing.dll"
+-r:"Library/PackageCache/com.unity.collections/Unity.Collections.Tests/System.Runtime.CompilerServices.Unsafe/System.Runtime.CompilerServices.Unsafe.dll"
 -r:"Library/PackageCache/com.unity.ext.nunit/net40/unity-custom/nunit.framework.dll"
 -r:"Library/PackageCache/com.unity.ext.nunit/net40/unity-custom/nunit.framework.dll"
 -r:"Library/PackageCache/com.unity.nuget.mono-cecil/Mono.Cecil.dll"
@@ -398,10 +400,12 @@
 -analyzer:"C:/Unity/6000.0.25f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.SourceGenerators.dll"
 -analyzer:"C:/Unity/6000.0.25f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Library/PackageCache/com.unity.ai.navigation/Editor/Updater/AssemblyInfo.cs"
-"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/BuiltInToNavMeshSurfaceConverterContainer.cs"
+"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/NavigationConverterContainer.cs"
+"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/NavigationUpdaterEditor.cs"
 "Library/PackageCache/com.unity.ai.navigation/Editor/Updater/NavMeshSceneConverter.cs"
-"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/NavMeshUpdaterEditor.cs"
 "Library/PackageCache/com.unity.ai.navigation/Editor/Updater/NavMeshUpdaterUtility.cs"
+"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/OffMeshLinkConverter.cs"
+"Library/PackageCache/com.unity.ai.navigation/Editor/Updater/OffMeshLinkUpdaterUtility.cs"
 -langversion:9.0
 /deterministic
 /optimize+

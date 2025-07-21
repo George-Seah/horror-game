@@ -1,6 +1,6 @@
 # Optimization
 
-Best practices around optimizing Burst-compiled code.
+Debug and profile to identify problems in Burst-compiled code and configure a range of options to optimize performance.
 
 |**Topic**|**Description**|
 |---|---|

@@ -3696,7 +3696,7 @@
                         break;
                     case "push":
                         instructionInfo = "Decrements the stack pointer and then stores the source operand on the top of " +
-                                          "the stack. Address and operand sizes are determined and used as follows:";
+                                          "the stack.";
                         break;
                     case "pusha":
                     case "pushad":

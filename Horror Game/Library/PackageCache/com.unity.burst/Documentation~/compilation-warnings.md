@@ -1,10 +1,10 @@
-# Compilation warnings 
+# Compilation warnings reference
 
-This page describes common compilation warnings, and how to fix them.
+This page describes common compilation warnings and how to fix them.
 
 ## IgnoreWarning attribute
 
-The [`Unity.Burst.CompilerServices.IgnoreWarningAttribute`](xref:Unity.Burst.CompilerServices.IgnoreWarningAttribute) attribute lets you suppress warnings for a specific function that is being compiled from Burst. However, the warnings that the Burst compiler generates are very important to pay attention to, so this attribute should be used sparingly and only when necessary. The sections below describe the specific situations in which you might want to suppress warnings.
+The [`Unity.Burst.CompilerServices.IgnoreWarningAttribute`](xref:Unity.Burst.CompilerServices.IgnoreWarningAttribute) attribute suppresses warnings for a specific Burst-compiled function. The warnings Burst generates are important to pay attention to, so this attribute should be used sparingly and only when necessary. The sections below describe the specific situations in which you might want to suppress warnings.
 
 ## BC1370
 
@@ -12,7 +12,7 @@ Warning BC1370 produces the message:
 
 > An exception was thrown from a function without the correct `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]` guard...
 
-This warning happens if Unity encounters a throw in code that `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]` doesn't guard. In the Editor, thrown exceptions will be caught and logged to the Console, but in a Player build, a `throw` becomes an abort, which crashes your application. Burst warns you about these exceptions, and advises you to place them in functions guarded with `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]`, because functions guarded with that attribute will not be included in Player builds. However, if you want to purposely throw an exception to crash your application, use the `IgnoreWarningAttribute` to suppress the warnings that Burst provides on the `throw`:
+This warning happens if Unity encounters a throw in code that `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]` doesn't guard. In the Editor, thrown exceptions are caught and logged to the Console, but in a Player build a `throw` becomes an abort, which crashes your application. Burst warns you about these exceptions, and advises you to place them in functions guarded with `[Conditional("ENABLE_UNITY_COLLECTIONS_CHECKS")]` because such functions are not included in Player builds. However, if you want to purposely throw an exception to crash your application, use the `IgnoreWarningAttribute` to suppress the warnings that Burst provides on the `throw`:
 
 ```c#
 [IgnoreWarning(1370)]
@@ -25,7 +25,7 @@ int DoSomethingMaybe(int x)
 ```
 
 > [!NOTE]
-> This warning is only produced for exceptions that persist into Player builds. Editor-only or debug-only exception throws that aren't compiled into Player builds will not trigger this warning.
+> This warning is only produced for exceptions that persist into Player builds. Editor-only or debug-only exception throws that aren't compiled into Player builds don't trigger this warning.
 
 ## BC1371
 
@@ -49,14 +49,14 @@ int BurstCompiledCode(int x,int y)
 }
 
 [BurstCompile]
-void BurstMethod()
+void BurstedMethod()
 {
     var myValue = BurstCompiledCode(1,3);
     DoSomeManagedStuff(myValue);
 }
 ```
 
-When Unity compiles your C# code in release mode, it optimizes and removes the local variable `myValue`. This means that Burst receives something like the following code :
+When Unity compiles your C# code in release mode, it optimizes and removes the local variable `myValue`. This means that Burst receives something like the following code:
 
 ```c#
 [BurstCompile]
@@ -91,9 +91,14 @@ Alternatively, if you're happy that the code is being discarded correctly, ignor
 ```c#
 [IgnoreWarning(1371)]
 [BurstCompile]
-void BurstMethod()
+void BurstedMethod()
 {
     var myValue = BurstCompiledCode(1,3);
     DoSomeManagedStuff(myValue);
 }
 ```
+
+## Additional resources
+
+* [`Unity.Burst.CompilerServices.IgnoreWarningAttribute` API reference](xref:Unity.Burst.CompilerServices.IgnoreWarningAttribute)
+* [Marking code for Burst compilation](compilation-burstcompile.md)

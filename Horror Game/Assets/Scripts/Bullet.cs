@@ -10,7 +10,7 @@ public class Bullet : MonoBehaviour
     }
     void FixedUpdate()
     {
-        transform.localPosition += transform.forward * 100;
+        transform.position += transform.forward * 50;
     }
     
     void OnCollisionEnter(Collision collision)

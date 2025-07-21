@@ -10,7 +10,7 @@ This section gives an example approach to modding with Burst and is a proof of c
 
 You can use this function in Play mode (or Standalone Players) only.
 
-Make sure you load the libraries as soon as possible, and before the first Burst compiled use of a C# method. Unity unloads any Burst libraries that `BurstRuntime.LoadAdditionalLibraries` loads when you exit Play mode in the Editor, quit a Standalone Player.
+Make sure you load the libraries as soon as possible, and before the first Burst-compiled use of a C# method. Unity unloads any Burst libraries that `BurstRuntime.LoadAdditionalLibraries` loads when you exit Play mode in the Editor or quit a Standalone Player.
 
 ## Example modding system
 
@@ -106,9 +106,9 @@ public class PluginManager : MonoBehaviour
 
 ```
 
-This code scans the "Mods" folder, and for each folder it finds within, it attempts to load both a managed dll and a Burst compiled dll. It does this by adding them to an internal list that it can then iterate on and call the respective interface functions. 
+This code scans the `Mods` folder, and for each folder it finds within, it attempts to load both a managed dll and a Burst-compiled dll. It does this by adding them to an internal list that it can then iterate on and call the respective interface functions. 
 
-The names of the files are arbitrary: see [Simple Create Mod Menu Button](#simple-create-mod-menu-button), which is the code that generated those files.
+The names of the files are arbitrary: refer to [Simple Create Mod Menu Button](#simple-create-mod-menu-button), which is the code that generated those files.
 
 Because this code loads the managed assemblies into the current domain, you need a domain reload to unload those before you can overwrite them. Unity automatically unloads the Burst dll files automatically unloaded when you exit Play mode. This is why a Boolean to disable the modding system is included, for testing in the Editor.
 
@@ -116,7 +116,7 @@ Because this code loads the managed assemblies into the current domain, you need
 
 Create a separate Unity project for this to use the project to produce the mod.
 
-The following script attaches to a UI Canvas that contains a text component called **Main UI Label**, and changes the text when the mod is used. The text is either **Plugin Updated : Bursted** or **Plugin Updated : Not Bursted**. You will see the **Plugin Updated : Bursted** by default, but if you comment out the lines that load the Burst library in the PluginManager above, then the Burst compiled code doesn't load and the message changes appropriately. 
+The following script attaches to a UI Canvas that contains a text component called **Main UI Label** and changes the text when the mod is used. The text is either **Plugin Updated : Bursted** or **Plugin Updated : Not Bursted**. You will see the **Plugin Updated : Bursted** by default, but if you comment out the lines that load the Burst library in the PluginManager above, then the Burst compiled code doesn't load and the message changes appropriately. 
 
 ```c#
 using Unity.Burst;
@@ -186,11 +186,11 @@ public class MyPluginModule : PluginModule
 
 ```
 
-Put the above script in a folder along with an assembly definition file with an assembly name of `TestMod_Managed`, so that the next script can locate the managed part. 
+Put the above script in a folder along with an assembly definition file with an assembly name of `TestMod_Managed` so the next script can locate the managed part. 
 
 ### Simple Create Mod Menu button
 
-The below script adds a menu button. When you use the menu button, it builds a Standalone Player, then copies the C# managed dll and the `lib_burst_generated`.dll into a chosen Mod folder. This example assumes you are using Windows.
+The following script adds a menu button. When you use the menu button, it builds a Standalone Player, then copies the C# managed dll and the `lib_burst_generated`.dll into a chosen `Mod` folder. This example assumes you are using Windows.
 
 ```c#
 using UnityEditor;
@@ -225,7 +225,7 @@ public class ScriptBatch
             if (!File.Exists(managedDest))  // Managed side not unloaded
                 FileUtil.CopyFileOrDirectory(managedSrc, managedDest);
             else
-                Debug.LogWarning($"Couldn't update manged dll, {managedDest} is it currently in use?");
+                Debug.LogWarning($"Couldn't update managed dll, {managedDest} is it currently in use?");
 
             // Copy Burst library
             var burstedDest = Path.Combine(path, $"{modName}_win_x86_64.dll");
@@ -239,3 +239,7 @@ public class ScriptBatch
     }
 }
 ```
+
+## Additional resources
+
+* [Import and configure plug-ins](xref:um-plugin-inspector)

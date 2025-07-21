@@ -43,7 +43,7 @@ You can make multiple connections to or from the same port, with some restrictio
 - You can connect multiple Control Output ports to a single Control Input port.
 - You can't connect a single Control Output port to multiple Control Input ports. Visual Scripting can't choose which node to run first. 
 
-![An image of the Graph Editor. An On Update Event node connects its trigger output port to the trigger input port on a Transform Rotate node. A Per Second node, with its Input set to 30, connects its output port to the X Angle, Y Angle, and Z Angle input ports on the Transform Rotate node. An On Keyboard Input Event node with its Key set to Space and its Action set to Down connects its trigger output port to the trigger input port on a Rigidbody Add Force node. An On Mouse Down Event node also connects its trigger output port to the trigger input on the Rigidbody Add Force node.](images\vs-multiple-connections-example.png)
+![An image of the Graph Editor. An On Update Event node connects its trigger output port to the trigger input port on a Transform Rotate node. A Per Second node, with its Input set to 30, connects its output port to the X Angle, Y Angle, and Z Angle input ports on the Transform Rotate node. An On Keyboard Input Event node with its Key set to Space and its Action set to Down connects its trigger output port to the trigger input port on a Rigidbody Add Force node. An On Mouse Down Event node also connects its trigger output port to the trigger input on the Rigidbody Add Force node.](images/vs-multiple-connections-example.png)
 
 For more information on how to connect nodes, see [Connect nodes in a Script Graph](vs-creating-connections.md).
 
@@ -63,12 +63,12 @@ A node might have additional controls that display on its header or in the [Grap
 <tbody>
 <tr>
 <td><strong>Control</strong></td>
-<td> <img src="images\vs-node-container-type.png"></td>
+<td> <img src="images\vs-node-container-type.png" alt="Game Object control dropdown"></td>
 <td>A control appears as a dropdown option on the header of a node. For example, a Container Type control might tell a node to expect to receive a GameObject instead of a Script Machine.</td>
 </tr>
 <tr>
 <td><strong>Inline Value</strong></td>
-<td> <img src="images\vs-node-inline-value.png"></td>
+<td> <img src="images\vs-node-inline-value.png" alt="Inline value field"></td>
 <td>An inline value appears as an object picker field next to a port. You can use an inline value instead of a node connection to specify a value for a node. Not all Visual Scripting types support inline values.</td>
 </tr>
 </tbody>

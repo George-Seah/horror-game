@@ -9,4 +9,15 @@ namespace Unity.Burst
     public class NoAliasAttribute : Attribute
     {
     }
+
+#if UNITY_BURST_EXPERIMENTAL_ALIAS_ATTRIBUTE
+    /// <summary>
+    /// The opposite of [NoAlias], used for job structs whose fields do not conform to the default alias rules.
+    /// This only works for structs and fields.
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Struct)]
+    public class AliasAttribute : Attribute
+    {
+    }
+#endif
 }

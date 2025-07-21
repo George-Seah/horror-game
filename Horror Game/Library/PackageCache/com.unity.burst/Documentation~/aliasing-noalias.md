@@ -2,7 +2,7 @@
 
 Use the [`[NoAlias]`](xref:Unity.Burst.NoAliasAttribute) attribute to give Burst additional information on the aliasing of pointers and structs.
 
-In most use cases, you won't need to use the `[NoAlias]` attribute. You don't need to use it with [`[NativeContainer]`](https://docs.unity3d.com/ScriptReference/Unity.Collections.LowLevel.Unsafe.NativeContainerAttribute.html) attributed structs, or with fields in job structs. This is because the Burst compiler infers the no-alias information.
+In most use cases, you won't need to use the `[NoAlias]` attribute. You don't need to apply it to a struct definition that already has a [`[NativeContainer]`](xref:Unity.Collections.LowLevel.Unsafe.NativeContainerAttribute) attribute or to fields in job structs because in these cases Burst infers the no-alias information.
 
 The `[NoAlias]` attribute is exposed so that you can construct complex data structures where Burst can't infer the aliasing. If you use the `[NoAlias]` attribute on a pointer that could alias with another, it might result in undefined behavior and make it hard to track down bugs.
 
@@ -355,3 +355,8 @@ ret
 ```
 
 In this case, Burst doesn't reload `ptr2`, and moves 42 into the return register.
+
+## Additional resources
+
+* [Memory aliasing](aliasing.md)
+* [Aliasing and the job system](aliasing-job-system.md)

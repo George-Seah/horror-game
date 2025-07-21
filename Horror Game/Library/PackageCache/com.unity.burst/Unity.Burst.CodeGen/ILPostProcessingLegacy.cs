@@ -454,7 +454,7 @@ namespace zzzUnity.Burst.CodeGen
         private TypeDefinition InjectDelegate(TypeDefinition declaringType, string originalName, MethodDefinition managed, string uniqueSuffix)
         {
             var injectedDelegateType = new TypeDefinition(declaringType.Namespace, $"{originalName}{uniqueSuffix}{PostfixBurstDelegate}",
-                TypeAttributes.NestedPublic |
+                TypeAttributes.NestedAssembly |
                 TypeAttributes.AutoLayout |
                 TypeAttributes.AnsiClass |
                 TypeAttributes.Sealed
@@ -687,9 +687,9 @@ namespace zzzUnity.Burst.CodeGen
             // 0x0100 is AggressiveInlining
             managedFallbackMethod.ImplAttributes |= (MethodImplAttributes)0x0100;
 
-            // The method needs to be public because we query for it in the ILPP code.
-            managedFallbackMethod.Attributes &= ~MethodAttributes.Private;
-            managedFallbackMethod.Attributes |= MethodAttributes.Public;
+            // The method needs to be internal because we query for it in the ILPP code.
+            managedFallbackMethod.Attributes &= ~MethodAttributes.Public;
+            managedFallbackMethod.Attributes |= MethodAttributes.Assembly;
 
             // private static class (Name_RID.$Postfix)
             var cls = new TypeDefinition(declaringType.Namespace, $"{burstCompileMethod.Name}{uniqueSuffix}{PostfixBurstDirectCall}",
@@ -885,6 +885,9 @@ namespace zzzUnity.Burst.CodeGen
             processor.Emit(OpCodes.Call, invoke);
             processor.Emit(OpCodes.Ret);
             FixDebugInformation(burstCompileMethod);
+
+            // Ensure that the original method does not have any sequence points
+            burstCompileMethod.DebugInformation.SequencePoints.Clear();
         }
 
         private static MethodDefinition FixDebugInformation(MethodDefinition method)

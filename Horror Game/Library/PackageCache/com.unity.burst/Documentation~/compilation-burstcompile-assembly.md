@@ -1,6 +1,6 @@
-# Assembly level BurstCompile
+# Defining Burst options for an assembly
 
-Use the `BurstCompile` attribute on an assembly to set options for all Burst jobs and function-pointers within the assembly:
+Use the `[BurstCompile]` attribute on an assembly to set options for all Burst jobs and function-pointers within the assembly:
 
 ```c#
 [assembly: BurstCompile(CompileSynchronously = true)]
@@ -39,3 +39,8 @@ struct BJob : IJob
     // ...
 }
 ```
+
+## Additional resources
+
+* [Marking code for Burst compilation](compilation-burstcompile.md)
+* [`[BurstCompile]` attribute API reference](xref:Unity.Burst.BurstCompileAttribute)

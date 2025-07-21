@@ -27,3 +27,8 @@ For all `DllImport` and internal calls, you can only use the following types as 
 
 > [!NOTE]
 >Passing structs by value isn't supported; you need to pass them through a pointer or reference. The only exception is that handle structs are supported. These are structs that contain a single field of pointer or integer type.
+
+## Additional resources 
+
+* [HPC# overview](csharp-hpc-overview.md)
+* [Burst intrinsics overview](csharp-burst-intrinsics.md)

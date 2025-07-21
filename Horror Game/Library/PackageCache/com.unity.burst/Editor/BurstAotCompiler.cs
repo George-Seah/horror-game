@@ -229,20 +229,20 @@ namespace Unity.Burst.Editor
             {
                 settings.targetPlatform = BurstAotCompiler.GetTargetPlatformAndDefaultCpu(settings.summary.platform,
                     out settings.targetCpus, settings.aotSettingsForTarget);
-                settings.combinations =
-                    BurstAotCompiler.CollectCombinations(settings.targetPlatform, settings.targetCpus,
-                        settings.summary);
                 settings.scriptingBackend =
 #if UNITY_2021_2_OR_NEWER
                     PlayerSettings.GetScriptingBackend(NamedBuildTarget.FromBuildTargetGroup(BuildPipeline.GetBuildTargetGroup(settings.summary.platform)));
 #else
                     PlayerSettings.GetScriptingBackend(BuildPipeline.GetBuildTargetGroup(settings.summary.platform));
 #endif
+                settings.combinations =
+                    BurstAotCompiler.CollectCombinations(settings.targetPlatform, settings.targetCpus,
+                        settings.summary, settings.scriptingBackend);
 #if UNITY_IOS
                 if (settings.targetPlatform == TargetPlatform.iOS)
                 {
                     settings.extraOptions = new List<string>();
-                    settings.extraOptions.Add(GetOption(OptionLinkerOptions, $"min-ios-version={PlayerSettings.iOS.targetOSVersionString}"));
+                    settings.extraOptions.Add(GetOption(OptionMinimumOSVersion, PlayerSettings.iOS.targetOSVersionString));
                     settings.extraOptions.Add(GetOption(OptionPlatformConfiguration, PlayerSettings.iOS.targetOSVersionString));
                 }
 #endif
@@ -250,7 +250,7 @@ namespace Unity.Burst.Editor
                 if (settings.targetPlatform == TargetPlatform.tvOS)
                 {
                     settings.extraOptions = new List<string>();
-                    settings.extraOptions.Add(GetOption(OptionLinkerOptions, $"min-tvos-version={PlayerSettings.tvOS.targetOSVersionString}"));
+                    settings.extraOptions.Add(GetOption(OptionMinimumOSVersion, PlayerSettings.tvOS.targetOSVersionString));
                     settings.extraOptions.Add(GetOption(OptionPlatformConfiguration, PlayerSettings.tvOS.targetOSVersionString));
                 }
 #endif
@@ -268,7 +268,7 @@ namespace Unity.Burst.Editor
                     if (targetOSVersionStringProperty == null) throw new Exception("Property `targetOSVersionString` not found");
                     var targetOSVersionString = targetOSVersionStringProperty.GetValue(null, null);
 #endif
-                    settings.extraOptions.Add(GetOption(OptionLinkerOptions, $"min-visionos-version={targetOSVersionString}"));
+                    settings.extraOptions.Add(GetOption(OptionMinimumOSVersion, targetOSVersionString));
                     settings.extraOptions.Add(GetOption(OptionPlatformConfiguration, targetOSVersionString));
                 }
 #endif
@@ -606,6 +606,11 @@ namespace Unity.Burst.Editor
             // Extract the TargetPlatform and Cpus from the current build settings
             commonOptions.Add(GetOption(OptionPlatform, settings.targetPlatform));
 
+            if (!BurstCompiler.IsApiAvailable("RegisterFrameInfo"))
+            {
+                commonOptions.Add(GetOption(OptionForceDisableFrameInfoRegistration));
+            }
+
             // --------------------------------------------------------------------------------------------------------
             // 1) Calculate AssemblyFolders
             // These are the folders to look for assembly resolution
@@ -735,13 +740,20 @@ namespace Unity.Burst.Editor
                     options.Add(GetOption(OptionTarget, cpu));
                 }
 
-                if (settings.targetPlatform == TargetPlatform.iOS || settings.targetPlatform == TargetPlatform.tvOS || settings.targetPlatform == TargetPlatform.Switch || settings.targetPlatform == TargetPlatform.visionOS)
+                if (settings.targetPlatform == TargetPlatform.iOS || settings.targetPlatform == TargetPlatform.tvOS || settings.targetPlatform == TargetPlatform.Switch || settings.targetPlatform == TargetPlatform.visionOS || settings.targetPlatform == TargetPlatform.visionSimulator)
                 {
                     options.Add(GetOption(OptionStaticLinkage));
 #if ENABLE_GENERATE_NATIVE_PLUGINS_FOR_ASSEMBLIES_API
-                    WriteStaticLinkCppFile($"{OutputBaseFolder}/{combination.OutputPath}");
+                    WriteStaticLinkCppFile($"{OutputBaseFolder}/{combination.OutputPath}", settings.targetPlatform == TargetPlatform.visionSimulator);
 #endif
                 }
+
+#if !UNITY_2022_3_OR_NEWER
+                if (settings.targetPlatform == TargetPlatform.iOS || settings.targetPlatform == TargetPlatform.tvOS)
+                {
+                    options.Add(GetOption(OptionAotEmitLlvmObjects));
+                }
+#endif
 
                 if (settings.targetPlatform == TargetPlatform.Windows)
                 {
@@ -825,6 +837,12 @@ namespace Unity.Burst.Editor
 
                     options.Add(GetOption(OptionDebug,
                         (settings.aotSettingsForTarget.DebugDataKind == DebugDataKind.Full) && (!combination.WorkaroundFullDebugInfo) ? "Full" : "LineOnly"));
+                }
+
+                if (settings.aotSettingsForTarget.StackProtector != StackProtector.Off)
+                {
+                    options.Add(GetOption(OptionStackProtector, settings.aotSettingsForTarget.StackProtector));
+                    options.Add(GetOption(OptionStackProtectorBufferSize, settings.aotSettingsForTarget.StackProtectorBufferSize));
                 }
 
                 if (!settings.aotSettingsForTarget.EnableOptimisations)
@@ -1096,13 +1114,17 @@ namespace Unity.Burst.Editor
             return false;
         }
 
-        public static void WriteStaticLinkCppFile(string dir)
+        private static bool IsForAnyEmbeddedLinux(BuildTarget target)
         {
-            Directory.CreateDirectory(dir);
-            string cppPath = Path.Combine(dir, "lib_burst_generated.cpp");
-            // Additionally we need a small cpp file (weak symbols won't unfortunately override directly from the libs
-            //presumably due to link order?
-            File.WriteAllText(cppPath, @"
+#if UNITY_2021_2_OR_NEWER
+            const int embeddedLinuxTarget = (int)BuildTarget.EmbeddedLinux;
+#else
+            const int embeddedLinuxTarget = 45;
+#endif
+            return (int)target == embeddedLinuxTarget || (int)target == 49;
+        }
+
+        private static readonly string StaticLinkCppFileContentsForStaticallyLinkedPlayer = @"
 extern ""C""
 {
     void Staticburst_initialize(void* );
@@ -1112,7 +1134,42 @@ extern ""C""
     void burst_initialize(void* i) { Staticburst_initialize(i); }
     void* BurstStaticMethodLookup(void* i) { return StaticBurstStaticMethodLookup(i); }
 }
-");
+";
+
+        private static readonly string StaticLinkCppFileContentsForDynamicallyLinkedPlayer = @"
+extern ""C""
+{
+    void BurstRegisterStaticMethodDelegates(void *initialize, void *lookup) __attribute__((weak));
+
+    void Staticburst_initialize(void *);
+    void *StaticBurstStaticMethodLookup(void *);
+}
+
+__attribute__((constructor))
+static void BurstSetup()
+{
+    if (BurstRegisterStaticMethodDelegates != nullptr)
+    {
+        BurstRegisterStaticMethodDelegates((void *)Staticburst_initialize, (void *)StaticBurstStaticMethodLookup);
+    }
+    else
+    {
+        fprintf(stderr, ""Warning: You need a newer version of Unity to run Burst compiled code in the vision simulator. Burst is disabled."");
+    }
+}
+";
+
+        public static void WriteStaticLinkCppFile(string dir, bool doInjectStaticLookupMethods = false)
+        {
+            Directory.CreateDirectory(dir);
+            string cppPath = Path.Combine(dir, "lib_burst_generated.cpp");
+            // Additionally we need a small cpp file (weak symbols won't unfortunately override directly from the libs
+            // presumably due to link order?
+            var contents = doInjectStaticLookupMethods
+                ? StaticLinkCppFileContentsForDynamicallyLinkedPlayer
+                : StaticLinkCppFileContentsForStaticallyLinkedPlayer;
+
+            File.WriteAllText(cppPath, contents);
         }
 
         /// <summary>
@@ -1122,7 +1179,7 @@ extern ""C""
         /// <param name="targetCpus">The target CPUs (e.g X64_SSE4)</param>
         /// <param name="report">Error reporting</param>
         /// <returns>The list of CPU combinations</returns>
-        internal static List<BurstOutputCombination> CollectCombinations(TargetPlatform targetPlatform, TargetCpus targetCpus, BuildSummary summary)
+        internal static List<BurstOutputCombination> CollectCombinations(TargetPlatform targetPlatform, TargetCpus targetCpus, BuildSummary summary, ScriptingImplementation scriptingImplementation)
         {
             var combinations = new List<BurstOutputCombination>();
 
@@ -1161,10 +1218,12 @@ extern ""C""
                 {
                     Debug.LogWarning("Burst Does not currently support the simulator, burst is disabled for this build.");
                 }
+#if !UNITY_2022_3_OR_NEWER
                 else if (Application.platform != RuntimePlatform.OSXEditor)
                 {
                     Debug.LogWarning("Burst Cross Compilation to iOS/tvOS for standalone player, is only supported on OSX Editor at this time, burst is disabled for this build.");
                 }
+#endif
                 else
                 {
                     // Looks like a way to detect iOS CPU capabilities in runtime (like getauxval()) is sysctlbyname()
@@ -1221,10 +1280,18 @@ extern ""C""
 
                 environment["BURST_ANDROID_MIN_API_LEVEL"] = $"{targetAPILevel}";
 
+                // Mono for Android is only supported on ARMv7. So if we're building for Mono, we need to filter out
+                // other architectures from the values in PlayerSettings.Android.targetArchitectures.
+                var androidTargetArch = PlayerSettings.Android.targetArchitectures;
+                var isMono = scriptingImplementation == ScriptingImplementation.Mono2x;
+                if (isMono)
+                {
+                    androidTargetArch &= AndroidArchitecture.ARMv7;
+                }
+
                 // Setting tempburstlibs/ as the interim target directory
                 // Don't target libs/ directly because incremental build pipeline doesn't expect the so's at that path
                 // Rather, so's are copied to the actual location in the gradle project in BurstAndroidGradlePostprocessor
-                var androidTargetArch = PlayerSettings.Android.targetArchitectures;
                 if ((androidTargetArch & AndroidArchitecture.ARMv7) != 0)
                 {
                     combinations.Add(new BurstOutputCombination("tempburstlibs/armeabi-v7a", new TargetCpus(BurstTargetCpu.ARMV7A_NEON32), collateDirectory: true, environment: environment));
@@ -1646,12 +1713,7 @@ extern ""C""
                 return TargetPlatform.QNX;
             }
 
-#if UNITY_2021_2_OR_NEWER
-            const int embeddedLinuxTarget = (int)BuildTarget.EmbeddedLinux;
-#else
-            const int embeddedLinuxTarget = 45;
-#endif
-            if (embeddedLinuxTarget == (int)target)
+            if (IsForAnyEmbeddedLinux(target))
             {
                 //EmbeddedLinux is supported on 2019.4 (shadow branch), 2020.3 (shadow branch) and 2021.2+ (official).
                 var embeddedLinuxArchitecture = GetEmbeddedLinuxTargetArchitecture();
@@ -1661,7 +1723,7 @@ extern ""C""
                 }
                 else if ("X64" == embeddedLinuxArchitecture)
                 {
-                    targetCpus = new TargetCpus(BurstTargetCpu.X64_SSE2); //lowest supported for now
+                    targetCpus = new TargetCpus(BurstTargetCpu.X64_SSE4);
                 }
                 else if (("X86" == embeddedLinuxArchitecture) || ("Arm32" == embeddedLinuxArchitecture))
                 {

@@ -26,7 +26,7 @@ using static Unity.Burst.Intrinsics.Arm.Neon;
 
 Burst CPU intrinsics are translated into specific CPU instructions. However, Burst has a special compiler pass which makes sure that your CPU target set in `Burst AOT Settings` is compatible with the intrinsics used in your code. This ensures you don't try to call unsupported instructions (for example, AArch64 Neon on an Intel CPU or AVX2 instructions on an SSE4 CPU), which causes the process to abort with an "Invalid instruction" exception. A compiler error is generated if the check fails.
 
-However, if you want to provide several code paths with different CPU targets, or to make sure your intrinsics code is compatible with any target CPU, you can wrap your intrinsics code with the followinf property checks:
+However, if you want to provide several code paths with different CPU targets, or to make sure your intrinsics code is compatible with any target CPU, you can wrap your intrinsics code with the following property checks:
 
 * [IsNeonSupported](xref:Unity.Burst.Intrinsics.Arm.Neon.IsNeonSupported)
 * [IsNeonArmv82FeaturesSupported](xref:Unity.Burst.Intrinsics.Arm.Neon.IsNeonArmv82FeaturesSupported)
@@ -64,7 +64,7 @@ These branches don't affect performance. Burst evaluates the `IsXXXSupported` pr
 If you run your application in .NET, Mono or IL2CPP without Burst enabled, all the `IsXXXSupported` properties return `false`. However, if you skip the test you can still run a reference version of most intrinsics in Mono (exceptions listed below), which is helpful if you need to use the managed debugger. Reference implementations are slow and only intended for managed debugging.
 
 >[!IMPORTANT]
->There isn't a reference managed implementation of Arm Neon intrinsics. This means that you can't use the technique mentioned in the previous paragraph to step through the intrinsics in Mono. FMA intrinsics that operate on doubles don't have a software fallback because of the inherit complexity in emulating fused 64-bit floating point math.
+>There isn't a reference managed implementation of Arm Neon intrinsics. This means that you can't use the technique mentioned in the previous paragraph to step through the intrinsics in Mono. FMA intrinsics that operate on doubles don't have a software fallback because of the inherent complexity of emulating fused 64-bit floating point math.
 
 
 
@@ -84,7 +84,7 @@ outputIndex += popcnt_u32((uint)m);
 
 ## Intel intrinsics
 
-The Intel intrinsics API mirrors the [C/C++ Intel instrinsics API](https://software.intel.com/sites/landingpage/IntrinsicsGuide/), with a the following differences:
+The Intel intrinsics API mirrors the [C/C++ Intel instrinsics API](https://software.intel.com/sites/landingpage/IntrinsicsGuide/), with the following differences:
 
 * All 128-bit vector types (`__m128`, `__m128i` and `__m128d`) are collapsed into `v128`
 * All 256-bit vector types (`__m256`, `__m256i` and `__m256d`) are collapsed into `v256`
@@ -109,5 +109,8 @@ Arm Neon C intrinsics (ACLE) use typed vectors, for example int32x4_t, and has s
 * [v128](xref:Unity.Burst.Intrinsics.v128)
 * [v256](xref:Unity.Burst.Intrinsics.v256)
 	
+For a categorized index of Arm Neon intrinsics supported in Burst, refer to the [Arm Neon intrinsics reference](csharp-burst-intrinsics-neon.md).
 
-For a categorized index of Arm Neon intrinsics supported in Burst, see the [Arm Neon intrinsics reference](csharp-burst-intrinsics-neon.md).
+## Additional resources 
+
+* [Arm Neon intrinsics reference](csharp-burst-intrinsics-neon.md)

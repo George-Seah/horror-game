@@ -63,3 +63,7 @@ struct MyContainer
     // Some other data...
 }
 ```
+
+## Additional resources
+
+* [`[AssumeRange]` attribute API reference](xref:Unity.Burst.CompilerServices.AssumeRangeAttribute)

@@ -6,7 +6,7 @@ To work with dynamic functions that process data based on other data states, use
 
 Function pointers don't support generic delegates. Also, avoid wrapping [`BurstCompiler.CompileFunctionPointer<T>`](xref:Unity.Burst.BurstCompiler.CompileFunctionPointer``1(``0)) within another open generic method. If you do this, Burst can't apply required attributes to the delegate, perform additional safety analysis, or perform potential optimizations. 
 
-Argument and return types are subject to the same restrictions as `DllImport` and internal calls. For more information, see the documentation on [DllImport and internal calls](csharp-burst-intrinsics-dllimport.md).
+Argument and return types are subject to the same restrictions as `DllImport` and internal calls. For more information, refer to the documentation on [DllImport and internal calls](csharp-burst-intrinsics-dllimport.md).
 
 ### Interoperability with IL2CPP
 
@@ -16,10 +16,10 @@ Interoperability of function pointers with IL2CPP requires `System.Runtime.Inter
 
 To use function pointers, identify the static functions that you want Burst to compile and do the following:
 
-1. Add a `[BurstCompile]` attribute to these functions
-1. Add a `[BurstCompile]` attribute to the containing type. This helps the Burst compiler find the static methods that have `[BurstCompile]` attribute
-1. Declare a delegate to create the "interface" of these functions
-1. Add a `[MonoPInvokeCallbackAttribute]` attribute to the functions. You need to add this so that IL2CPP works with these functions. For example:
+1. Add a `[BurstCompile]` attribute to these functions.
+1. Add a `[BurstCompile]` attribute to the containing type. This helps the Burst compiler find the static methods that have the `[BurstCompile]` attribute.
+1. Declare a delegate to create the "interface" of these functions.
+1. Add a `[MonoPInvokeCallbackAttribute]` attribute to the functions to make them compatible with IL2CPP. For example:
 
     ```c#
     // Instruct Burst to look for static methods with [BurstCompile] attribute
@@ -45,8 +45,19 @@ To use function pointers, identify the static functions that you want Burst to c
         FunctionPointer<Process2FloatsDelegate> mulFunctionPointer = BurstCompiler.CompileFunctionPointer<Process2FloatsDelegate>(MultiplyFloat);
     
         // Contains a compiled version of AddFloat with Burst
-        FunctionPointer<Process2FloatsDelegate> addFunctionPointer = BurstCompiler.    CompileFunctionPointer<Process2FloatsDelegate>(AddFloat);
+        FunctionPointer<Process2FloatsDelegate> addFunctionPointer = BurstCompiler.CompileFunctionPointer<Process2FloatsDelegate>(AddFloat);
     ```
+
+The `[MonoPInvokeCallbackAttribute]` is available under the `AOT` namespace. If for any reason it's not available, you can create it locally by declaring it as follows:
+
+```c#
+public class MonoPInvokeCallbackAttribute : Attribute
+{​
+
+}
+```
+
+For more information on `[MonoPInvokeCallbackAttribute]` and example usage in the iOS context, refer to [Callback from native code](xref:um-ios-native-plugin-call-back) in the manual.
 
 ### Using function pointers in a job
 
@@ -76,7 +87,7 @@ Using Burst-compiled function pointers from C# might be slower than their pure C
 
 ## Performance considerations
 
-Where possible, you use a job over a function pointer to run Burst compiled code, because jobs are more optimal. Burst provides better aliasing calculations for jobs because the job safety system has more optimizations by default.
+Where possible, use a job over a function pointer to run Burst compiled code, because jobs are more performant. Burst provides better aliasing calculations for jobs because the job safety system has more optimizations by default.
 
 You also can't pass most of the `[NativeContainer]` structs like `NativeArray` directly to function pointers and must use a job struct to do so. Native container structs contain managed objects for safety checks that the Burst compiler can work around when compiling jobs, but not for function pointers.
 
@@ -154,10 +165,10 @@ struct MyJob : IJobParallelForBatch
 }
 ```
 
-Thee modified `MyFunctionPointer` takes a `count` of elements to process, and loops over the `input` and `output` pointers to do a lot of calculations. The `MyJob` becomes an `IJobParallelForBatch`, and the `count` is passed directly into the function pointer. This is better for performance because of the following reasons:
+The modified `MyFunctionPointer` takes a `count` of elements to process, and loops over the `input` and `output` pointers to do a lot of calculations. The `MyJob` becomes an `IJobParallelForBatch`, and the `count` is passed directly into the function pointer. This is better for performance because:
 
 * Burst vectorizes the `MyFunctionPointer` call.
-* Because Burst processes `count` items per function pointer, any overhead of calling the function pointer is reduced by `count` times. For example, if you run a batch of 128, the function pointer overhead is 1/128th per `index` of what it was previously.
+* Burst processes `count` items per function pointer, so any overhead of calling the function pointer is reduced by `count` times. For example, if you run a batch of 128, the function pointer overhead is 1/128th per `index` of what it was previously.
 * Batching results in a 1.53x performance gain over not batching.
 
 However, to get the best possible performance, use a job. This gives Burst the most visibility over what you want it to do, and the most opportunities to optimize:
@@ -177,3 +188,8 @@ struct MyJob : IJobParallelFor
 ```
 
 This runs 1.26x faster than the batched function pointer example, and 1.93x faster than the non-batched function pointer examples. Burst has perfect aliasing knowledge and can make the broadest modifications to the above. This code is also a lot simpler than either of the function pointer cases.
+
+## Additional resources
+
+* [HPC# Overview](csharp-hpc-overview.md)
+* [Calling Burst-compiled code](csharp-calling-burst-code.md)

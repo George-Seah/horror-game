@@ -2,7 +2,7 @@
 
 Memory aliasing is a way to tell Burst how your code uses data. This can improve and optimize the performance of your application.
 
-Memory aliasing happens when locations in the memory overlap each other. The following documentation outlines the difference between memory aliasing, and no memory aliasing.  
+Memory aliasing happens when locations in the memory overlap each other. 
 
 The following example shows a job that copies data from an input array to an output array:
 
@@ -29,11 +29,11 @@ private struct CopyJob : IJob
 
 If the arrays `Input` and `Output` don't overlap, which means that their respective memory location doesn't overlap, the code returns the following result after running this job on a sample input/output:
 
-![](images/burst-noalias.png)</br>_Memory with no aliasing_
+![Memory with no aliasing](images/burst-noalias.png)</br>_Memory with no aliasing_
 
 If Burst is [noalias](aliasing-noalias.md) aware, it can work at the scalar level to optimize the previous scalar loop. It does this through a process called vectorizing, where it rewrites the loop to process elements in a small batch. For example, Burst could work at vector level in 4 by 4 elements: 
 
-![](images/burst-noalias-vectorized.png)<br/>_Memory with no aliasing vectorized_
+![Memory with no aliasing vectorized](images/burst-noalias-vectorized.png)<br/>_Memory with no aliasing vectorized_
 
 ## Memory aliasing
 
@@ -43,7 +43,7 @@ If the `Output` array overlaps the `Input` array by one element (for example `Ou
 
 If [Burst isn't aware of the memory aliasing](aliasing-noalias.md), it tries to auto vectorize the loop, which results in the following:
 
-![](images/burst-alias-vectorized.png)<br/>_Memory with aliasing and invalid vectorized code_
+![Memory with aliasing and invalid vectorized code](images/burst-alias-vectorized.png)<br/>_Memory with aliasing and invalid vectorized code_
 
 The result of this code is invalid and might lead to bugs if Burst can't identify them.
 
@@ -172,3 +172,8 @@ private struct CopyJob : IJob
 ```
 
 These checks only run when optimizations are enabled, because proper aliasing deduction is intrinsically linked to the optimizer's ability to see through functions via inlining.
+
+## Additional resources
+
+* [NoAlias attribute](aliasing-noalias.md)
+* [Aliasing and the job system](aliasing-job-system.md)

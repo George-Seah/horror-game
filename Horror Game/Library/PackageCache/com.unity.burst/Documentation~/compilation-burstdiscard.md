@@ -1,6 +1,6 @@
-# BurstDiscard attribute
+# Exclude code from Burst compilation
 
-If you're running C# code not inside Burst-compiled code, you might want to use managed objects, but not compile these portions of code within Burst. To do this, use the `[BurstDiscard]` attribute on a method:
+By default, Burst compiles all methods in jobs decorated with the `[BurstCompile]` attribute. But some methods aren't appropriate for Burst compilation. For example, methods that perform logging using managed objects or that check the validity of something only valid in a managed environment can only run in a .NET runtime. In such cases you can use the [`[BurstDiscard]`](xref:Unity.Burst.BurstDiscardAttribute) attribute on a method or property to exclude it from Burst compilation:
 
 ```c#
 [BurstCompile]
@@ -38,3 +38,7 @@ private static bool IsBurst()
 }
 ```
 
+## Additional resources
+
+* [`[BurstDiscard]` attribute API reference](xref:Unity.Burst.BurstDiscardAttribute)
+* [Marking code for Burst compilation](compilation-burstcompile.md)

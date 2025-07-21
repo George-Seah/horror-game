@@ -25,7 +25,6 @@ namespace zzzUnity.Burst.CodeGen
         private Dictionary<MethodDefinition, TypeReference> _needsIl2cppInvoke;
         private Dictionary<MethodDefinition, List<CaptureInformation>> _capturedSets;
         private MethodDefinition _monoPInvokeAttributeCtorDef;
-        private MethodDefinition _nativePInvokeAttributeCtorDef;
         private MethodDefinition _unmanagedFunctionPointerAttributeCtorDef;
         private TypeReference _burstFunctionPointerType;
         private TypeReference _burstCompilerType;
@@ -52,7 +51,6 @@ namespace zzzUnity.Burst.CodeGen
             _capturedSets = new Dictionary<MethodDefinition, List<CaptureInformation>>();
             _monoPInvokeAttributeCtorDef = null;
             _unmanagedFunctionPointerAttributeCtorDef = null;
-            _nativePInvokeAttributeCtorDef = null;  // Only present on DOTS_PLAYER
             _burstFunctionPointerType = null;
             _burstCompilerType = null;
             _systemType = null;
@@ -75,7 +73,7 @@ namespace zzzUnity.Burst.CodeGen
         {
             if (_monoPInvokeAttributeCtorDef == null)
             {
-                var burstAssembly = GetAsmDefinitionFromFile(loader, "Unity.Burst");
+                var burstAssembly = assemblyDefinition.Name.Name == "Unity.Burst" ? assemblyDefinition : GetAsmDefinitionFromFile(loader, "Unity.Burst");
 
                 _burstFunctionPointerType = burstAssembly.MainModule.GetType("Unity.Burst.FunctionPointer`1");
                 _burstCompilerType = burstAssembly.MainModule.GetType("Unity.Burst.BurstCompiler");
@@ -419,8 +417,7 @@ namespace zzzUnity.Burst.CodeGen
                     var implementationMethod = ldFtn.Operand as MethodDefinition;
 
                     var hasInvokeAlready = implementationMethod?.CustomAttributes.FirstOrDefault(x =>
-                         (x.AttributeType.FullName == _monoPInvokeAttributeCtorDef.DeclaringType.FullName)
-                         || (_nativePInvokeAttributeCtorDef != null && x.AttributeType.FullName == _nativePInvokeAttributeCtorDef.DeclaringType.FullName));
+                        x.AttributeType.Name == _monoPInvokeAttributeCtorDef.DeclaringType.Name);
 
                     if (hasInvokeAlready != null)
                     {
