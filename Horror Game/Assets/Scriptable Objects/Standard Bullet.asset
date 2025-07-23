@@ -14,3 +14,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 5
   particleFXPrefab: {fileID: 7227013433733064768, guid: 6785542401deae24ba8e53eb0861a849, type: 3}
+  color: {r: 1, g: 0.84313726, b: 0, a: 1}

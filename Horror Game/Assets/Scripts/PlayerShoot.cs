@@ -3,12 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Cinemachine;
+using UnityEngine.UI;
 
 public class PlayerShoot : MonoBehaviour
 {
 
-    [SerializeField] List<Bullet> bullets = new List<Bullet>();
-
+    public List<Bullet> bullets { get; private set; } = new List<Bullet>();
+    public int maxBullets { get; private set; } = 10;
+    [SerializeField] Image[] bulletBars;
     //[SerializeField] int damage;
     //[SerializeField] GameObject dustFX;
     bool isShooting;
@@ -19,6 +21,31 @@ public class PlayerShoot : MonoBehaviour
     {
         animation = GetComponent<Animation>();
         cinemachineImpulseSource = GetComponent<CinemachineImpulseSource>();
+        AdjustBulletUI();
+    }
+
+    public void AddAmmo(Bullet bulletType, int ammoAmount)
+    {
+        for (int i = 0; i < ammoAmount; i++) bullets.Add(bulletType);
+        while (bullets.Count > maxBullets) bullets.RemoveAt(maxBullets);
+        AdjustBulletUI();
+    }
+
+    void AdjustBulletUI()
+    {
+        for (int i = 0; i < maxBullets; i++)
+        {
+
+            if (i < bullets.Count)
+            {
+                bulletBars[i].gameObject.SetActive(true);
+                bulletBars[i].color = bullets[i].color;
+            }
+            else
+            {
+                bulletBars[i].gameObject.SetActive(false);
+            }
+        }
     }
 
     public void SetIsShootingFalse()
@@ -43,7 +70,6 @@ public class PlayerShoot : MonoBehaviour
             hit.transform.GetComponentInParent<CreatureHealth>()?.Damage(bullets[0].damage);
             //Instantiate(dustFX, transform.position);
             Instantiate(bullets[0].particleFXPrefab, hit.point, transform.rotation);
-            bullets.RemoveAt(0);
             Debug.Log("Did Hit");
         }
         else
@@ -52,5 +78,7 @@ public class PlayerShoot : MonoBehaviour
             Debug.Log("Did not Hit");
         }
 
+        bullets.RemoveAt(0);
+        AdjustBulletUI();
     }
 }

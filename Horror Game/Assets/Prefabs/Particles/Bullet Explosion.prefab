@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 6331154750925871217}
   - component: {fileID: 8064866687605556361}
   - component: {fileID: 9097462159344359194}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Bullet Explosion
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5016,7 +5016,7 @@ GameObject:
   - component: {fileID: 869014877579413095}
   - component: {fileID: 7182891031854573863}
   - component: {fileID: 5196369737796682852}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Shockwave
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9919,7 +9919,7 @@ GameObject:
   - component: {fileID: 7663266416855408122}
   - component: {fileID: 6778413072059289107}
   - component: {fileID: 2678764907839544367}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Embers
   m_TagString: Untagged
   m_Icon: {fileID: 0}

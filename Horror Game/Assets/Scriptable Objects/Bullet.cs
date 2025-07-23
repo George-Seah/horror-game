@@ -5,4 +5,5 @@ public class Bullet : ScriptableObject
 {
     public int damage = 5;
     public GameObject particleFXPrefab;
+    public Color color;
 }
