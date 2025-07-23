@@ -6,10 +6,12 @@ using Unity.Cinemachine;
 
 public class PlayerShoot : MonoBehaviour
 {
+
+    [SerializeField] List<Bullet> bullets = new List<Bullet>();
+
+    //[SerializeField] int damage;
+    //[SerializeField] GameObject dustFX;
     bool isShooting;
-    [SerializeField] GameObject bullet;
-    [SerializeField] int damage;
-    [SerializeField] GameObject dustFX;
     Animation animation;
     CinemachineImpulseSource cinemachineImpulseSource;
 
@@ -26,15 +28,9 @@ public class PlayerShoot : MonoBehaviour
 
     public void Shoot()
     {
-        if (isShooting) return;
+        if (isShooting || bullets.Count <= 0) return;
         isShooting = true;
-        /*
-        Transform newBullet = Instantiate(bullet).transform;
-        newBullet.position = transform.position;
-        //newBullet.eulerAngles = currentEulerAngles;
-        Bullet newBulletScript = newBullet.GetComponent<Bullet>();
-        newBulletScript.SetDamage(damage);
-        */
+
         animation.Play();
         cinemachineImpulseSource.GenerateImpulse();
 
@@ -44,9 +40,10 @@ public class PlayerShoot : MonoBehaviour
 
         {
             Debug.DrawRay(transform.position, transform.parent.forward * hit.distance, Color.yellow);
-            hit.transform.GetComponentInParent<CreatureHealth>()?.Damage(damage);
+            hit.transform.GetComponentInParent<CreatureHealth>()?.Damage(bullets[0].damage);
             //Instantiate(dustFX, transform.position);
-            Instantiate(dustFX, hit.point, transform.rotation);
+            Instantiate(bullets[0].particleFXPrefab, hit.point, transform.rotation);
+            bullets.RemoveAt(0);
             Debug.Log("Did Hit");
         }
         else
