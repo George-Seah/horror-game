@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8799390571821038405}
   - component: {fileID: 2901999347695146399}
   - component: {fileID: 1655662044733168658}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Normal Bullet Refill
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -157,10 +157,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Revolver_Bullet (7)
       objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
       value: 93.19999
@@ -238,10 +234,6 @@ PrefabInstance:
     - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_Name
       value: Revolver_Bullet (1)
-      objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
@@ -321,10 +313,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Revolver_Bullet
       objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
       value: 93.19999
@@ -402,10 +390,6 @@ PrefabInstance:
     - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_Name
       value: Revolver_Bullet (5)
-      objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
@@ -485,10 +469,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Revolver_Bullet (3)
       objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
       value: 93.19999
@@ -566,10 +546,6 @@ PrefabInstance:
     - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_Name
       value: Revolver_Bullet (6)
-      objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
@@ -649,10 +625,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Revolver_Bullet (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x
       value: 93.19999
@@ -730,10 +702,6 @@ PrefabInstance:
     - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_Name
       value: Revolver_Bullet (4)
-      objectReference: {fileID: 0}
-    - target: {fileID: 19026177839507540, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
-      propertyPath: m_Layer
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 794965158903345902, guid: b7ae10a17e67dc74eade85509a3d702f, type: 3}
       propertyPath: m_LocalScale.x

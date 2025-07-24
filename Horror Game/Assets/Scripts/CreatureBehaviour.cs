@@ -10,23 +10,13 @@ public class CreatureBehaviour : MonoBehaviour
         navMeshAgent = GetComponent<NavMeshAgent>();
     }
 
-    void HandleCollision(Collider other)
+    void FixedUpdate()
     {
-        //GameObject player = GameObject.FindWithTag("Player");
+        GameObject player = GameObject.FindWithTag("Player");
 
-        if (other.gameObject.tag == "Player")
+        if (player)
         {
-            navMeshAgent?.SetDestination(other.transform.position);
+            navMeshAgent.SetDestination(player.transform.position);
         }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        HandleCollision(other);
-    }
-
-    void OnTriggerStay(Collider other)
-    {
-        HandleCollision(other);
     }
 }
