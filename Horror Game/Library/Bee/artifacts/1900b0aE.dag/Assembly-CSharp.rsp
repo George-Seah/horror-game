@@ -450,6 +450,7 @@
 "Assets/Scriptable Objects/Bullet.cs"
 "Assets/Scripts/AutoSpin.cs"
 "Assets/Scripts/CreatureBehaviour.cs"
+"Assets/Scripts/CreatureDamagePlayer.cs"
 "Assets/Scripts/CreatureHealth.cs"
 "Assets/Scripts/CreatureRotate.cs"
 "Assets/Scripts/Explosion.cs"
