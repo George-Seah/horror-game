@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26c56320697efe544b7abf5ee060dd17, type: 3}
+  m_Name: Ice Bullet
+  m_EditorClassIdentifier: 
+  damage: 5
+  particleFXPrefab: {fileID: 7227013433733064768, guid: 6785542401deae24ba8e53eb0861a849, type: 3}
+  color: {r: 0, g: 0.68027973, b: 1, a: 1}
+  element: Ice
+  impactObject: {fileID: 7206771811947898297, guid: 4c77b15112819d04da6733b3ac9075af, type: 3}

@@ -11,7 +11,7 @@ public class CreatureHealth : MonoBehaviour
 
         if (health <= 0)
         {
-            if(deathParticles) Instantiate(deathParticles);
+            if(deathParticles) Instantiate(deathParticles, transform.position, Quaternion.identity);
             Destroy(gameObject);
         }
     }

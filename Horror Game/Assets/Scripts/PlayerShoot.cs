@@ -67,14 +67,23 @@ public class PlayerShoot : MonoBehaviour
 
         {
             Debug.DrawRay(transform.position, transform.parent.forward * hit.distance, Color.yellow);
-            hit.transform.GetComponentInParent<CreatureHealth>()?.Damage(bullets[0].damage);
+            CreatureHealth creatureHealth = hit.transform.GetComponentInParent<CreatureHealth>();
+            creatureHealth?.Damage(bullets[0].damage);
             //Instantiate(dustFX, transform.position);
             Instantiate(bullets[0].particleFXPrefab, hit.point, transform.rotation);
+            if (!creatureHealth && bullets[0].impactObject)
+            {
+                Vector3 forwardDir = Vector3.Cross(hit.normal, transform.right);
+                Quaternion rot = Quaternion.LookRotation(forwardDir, hit.normal);
+                Transform impactObject = Instantiate(bullets[0]?.impactObject, hit.point, rot).transform;
+                //impactObject.Rotate(90, 0, 90, Space.Self);
+            }
             Debug.Log("Did Hit");
         }
         else
         {
-            Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
+            Debug.DrawRay(transform.position, transform.parent.forward * hit.distance, Color.yellow);
+            //Debug.DrawRay(transform.position, transform.TransformDirection(Vector3.forward) * 1000, Color.white);
             Debug.Log("Did not Hit");
         }
 
